@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="Bodde.Query.Abstractions/Bodde.Query.Abstractions.csproj" />
+  <Project Path="Bodde.Query.Core/Bodde.Query.Core.csproj" />
 </Solution>
