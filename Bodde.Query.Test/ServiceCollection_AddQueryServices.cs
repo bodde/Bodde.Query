@@ -8,7 +8,7 @@ namespace Bodde.Query.Test;
 
 public class ServiceCollection_AddQueryServices
 {
-    private ServiceCollection sut;
+    private readonly ServiceCollection sut;
 
     public ServiceCollection_AddQueryServices()
     {        
