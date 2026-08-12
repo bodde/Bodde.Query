@@ -5,7 +5,7 @@ namespace Bodde.Query.Core;
 
 public static class ServiceCollectionExtensions
 {
-    public static TServiceCollection AddQueryServices<TServiceCollection>(this TServiceCollection services, Action<IQueryServicesBuilder> builder = null)
+    public static TServiceCollection AddQueryServices<TServiceCollection>(this TServiceCollection services, Action<IQueryServicesBuilder>? builder = null)
         where TServiceCollection : IServiceCollection
     {        
         var queryServicesBuilder = new QueryServicesBuilder();
