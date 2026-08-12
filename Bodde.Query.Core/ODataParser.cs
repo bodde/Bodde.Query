@@ -41,7 +41,7 @@ internal partial class ODataParser : IQueryCriteriaParser
         );
     }
 
-    public FilterCriteria? ParseFilter(string filterString)
+    public FilterCriteria.FilterExpression? ParseFilterExpression(string filterString)
     {
         if(filterString == null) 
             return null;
@@ -58,10 +58,28 @@ internal partial class ODataParser : IQueryCriteriaParser
         filterString = ProcessComparisonExpressions(filterString, expressionsBag);
         filterString = ProcessNotAndLogicalExpressions(filterString, expressionsBag);
 
-        var topLevelExpression = CreateTopLevelExpression(filterString, expressionsBag);
-
-        return new FilterCriteria(topLevelExpression);
+        return CreateTopLevelExpression(filterString, expressionsBag);
     }
+
+    public FilterCriteria? ParseFilter(string filterString)
+    {        
+        var topLevelExpression = ParseFilterExpression(filterString);      
+        return topLevelExpression != null ? new FilterCriteria(topLevelExpression) : null;
+    }
+
+    public OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString)
+    {
+        if(orderByString == null) 
+            return [];
+
+        var orderByItems = orderByString
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(_ => ParseOrderByItem(_))
+            .ToArray();
+
+        return orderByItems;
+    }
+
 
     public OrderByCriteria? ParseOrderBy(string orderByString)
     {
@@ -124,6 +142,23 @@ internal partial class ODataParser : IQueryCriteriaParser
             Paging: paging,
             Filter: filter,
             OrderBy: orderBy
+        );
+    }
+    
+    private OrderByCriteria.OrderByItem ParseOrderByItem(string itemString)
+    {
+        if(itemString == null) 
+            throw new ArgumentNullException(nameof(itemString));
+
+        var parts = itemString.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var propertyPath = parts[0];
+        var direction = parts.Length > 1 && parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase)
+            ? OrderByCriteria.SortDirection.Descending
+            : OrderByCriteria.SortDirection.Ascending;
+
+        return new OrderByCriteria.OrderByItem(
+            PropertyPath: propertyPath,
+            Direction: direction
         );
     }
 
@@ -426,18 +461,6 @@ internal partial class ODataParser : IQueryCriteriaParser
         throw new InvalidOperationException($"OData operator '{operatorString}' is not supported. Supported operators are: {_comparisonOperators.Keys.ToCsv()}");
     }
 
-    private static OrderByCriteria.OrderByItem ParseOrderByItem(string itemString)
-    {
-        var parts = itemString.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var propertyPath = parts[0];
-        var direction = parts.Length > 1 && parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase)
-            ? OrderByCriteria.SortDirection.Descending
-            : OrderByCriteria.SortDirection.Ascending;
-        return new OrderByCriteria.OrderByItem(
-            PropertyPath: propertyPath,
-            Direction: direction
-        );
-    }
 
     [GeneratedRegex(@"([\w\.]+\s+(?:eq|ne|gt|ge|lt|le|contains|startswith|endswith|in)\s+(?:null|true|false|'[^']*'|\(.+\)|[\d\-T\:\.Z]+))", RegexOptions.IgnoreCase)]
     private static partial Regex ComparisonStatementsRegex();

@@ -13,4 +13,6 @@ public class Employee
     public DateTime HireDate { get; set; }
 
     public int Salary { get; set; }
+    
+    public bool IsActive { get; set; }
 }

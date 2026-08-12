@@ -9,7 +9,11 @@ public interface IQueryCriteriaParser
 
     FilterCriteria? ParseFilter(string filterString);
 
+    FilterCriteria.FilterExpression? ParseFilterExpression(string filterString);
+
     OrderByCriteria? ParseOrderBy(string orderByString);
+
+    OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString);
 
     QueryCriteria? Parse(string criteriaString);
     

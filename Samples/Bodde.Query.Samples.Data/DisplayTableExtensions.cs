@@ -80,21 +80,31 @@ public static class DisplayTableExtensions
 
     private static string GetPropertyName<T, TProperty>(Expression<Func<T, TProperty>> expression)
     {
-        var memberExpression = GetMemberExpression(expression);
+        var memberExpressions = GetMemberExpressions(expression);
 
-        return memberExpression.Member.Name;
+        return String.Join(".", memberExpressions.Select(me => me.Member.Name));
     }
 
-    private static MemberExpression GetMemberExpression<T, TProperty>(Expression<Func<T, TProperty>> expression)
+    private static MemberExpression[] GetMemberExpressions<T, TProperty>(Expression<Func<T, TProperty>> expression)
     {
         if(expression.Body is UnaryExpression unaryExpression)
         {
-            return (MemberExpression)unaryExpression.Operand;
+            return [(MemberExpression)unaryExpression.Operand];
         }
 
         if (expression.Body is MemberExpression memberExpression)
         {
-            return memberExpression;
+            var memberExpressions = new List<MemberExpression>();
+            var innerExpression = memberExpression.Expression as MemberExpression;
+            while(innerExpression != null)
+            {
+                memberExpressions.Add(innerExpression);
+                innerExpression = innerExpression.Expression as MemberExpression;
+            }
+
+            memberExpressions.Add(memberExpression);
+
+            return memberExpressions.ToArray();
         }
 
         throw new ArgumentException("Expression is not a property access expression");
