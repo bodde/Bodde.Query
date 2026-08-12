@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Samples/">
+    <Project Path="Samples/Bodde.Query.Sample.ConsoleApp/Bodde.Query.Sample.ConsoleApp.csproj" />
+  </Folder>
   <Project Path="Bodde.Query.Abstractions/Bodde.Query.Abstractions.csproj" />
   <Project Path="Bodde.Query.Core/Bodde.Query.Core.csproj" />
   <Project Path="Bodde.Query.EntityFrameworkCore/Bodde.Query.EntityFrameworkCore.csproj" />
