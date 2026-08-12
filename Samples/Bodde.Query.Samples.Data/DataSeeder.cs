@@ -4,10 +4,11 @@ public static class DataSeeder
 {
     public static IEnumerable<Department> SeedDepartments()
     {
+        var id = 1;
         return [
-          new Department { Name = "Human Resources" },
-          new Department { Name = "Engineering" },
-          new Department { Name = "Marketing" }
+          new Department { Id = id++, Name = "Human Resources" },
+          new Department { Id = id++, Name = "Engineering" },
+          new Department { Id = id++, Name = "Marketing" }
         ];
     }
 
