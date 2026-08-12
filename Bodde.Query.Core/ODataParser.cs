@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Bodde.Common.Extensions;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 
@@ -7,6 +8,20 @@ namespace Bodde.Query.Core;
 
 internal partial class ODataParser : IQueryCriteriaParser
 {
+    private static readonly Dictionary<string, FilterCriteria.ComparisonOperator> _comparisonOperators = new()
+    {
+        {"eq", FilterCriteria.ComparisonOperator.Equals},
+        {"ne", FilterCriteria.ComparisonOperator.NotEquals},
+        {"gt", FilterCriteria.ComparisonOperator.GreaterThan},
+        {"ge", FilterCriteria.ComparisonOperator.GreaterThanOrEqual},
+        {"lt", FilterCriteria.ComparisonOperator.LessThan},
+        {"le", FilterCriteria.ComparisonOperator.LessThanOrEqual},
+        {"contains", FilterCriteria.ComparisonOperator.Contains},
+        {"startswith", FilterCriteria.ComparisonOperator.StartsWith},
+        {"endswith", FilterCriteria.ComparisonOperator.EndsWith},
+        {"in", FilterCriteria.ComparisonOperator.In}
+    };
+    
     public PagingCriteria? ParsePaging(string pagingString)
     {
         if (string.IsNullOrWhiteSpace(pagingString))
@@ -180,8 +195,8 @@ internal partial class ODataParser : IQueryCriteriaParser
     private static string[] GetInnerLogicalExpressions(string filterString)
     {
         return SurroundedByParenthesesRegex().Matches(filterString)
-                        .Select(m => m.Value)
-                        .ToArray();
+                .Select(m => m.Value)
+                .ToArray();
     }
 
     private string ProcessInnerLogicalExpressions(
@@ -403,20 +418,12 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private FilterCriteria.ComparisonOperator ConvertODataOperatorToComparisonOperator(string operatorString)
     {
-        return operatorString switch
+        if (_comparisonOperators.TryGetValue(operatorString, out var comparisonOperator))
         {
-            "eq" => FilterCriteria.ComparisonOperator.Equals,
-            "ne" => FilterCriteria.ComparisonOperator.NotEquals,
-            "gt" => FilterCriteria.ComparisonOperator.GreaterThan,
-            "ge" => FilterCriteria.ComparisonOperator.GreaterThanOrEqual,
-            "lt" => FilterCriteria.ComparisonOperator.LessThan,
-            "le" => FilterCriteria.ComparisonOperator.LessThanOrEqual,
-            "contains" => FilterCriteria.ComparisonOperator.Contains,
-            "startswith" => FilterCriteria.ComparisonOperator.StartsWith,
-            "endswith" => FilterCriteria.ComparisonOperator.EndsWith,
-            "in" => FilterCriteria.ComparisonOperator.In,
-            _ => throw new NotImplementedException($"OData operator '{operatorString}' is not supported.")
-        };
+            return comparisonOperator;
+        }
+
+        throw new InvalidOperationException($"OData operator '{operatorString}' is not supported. Supported operators are: {_comparisonOperators.Keys.ToCsv()}");
     }
 
     private static OrderByCriteria.OrderByItem ParseOrderByItem(string itemString)
