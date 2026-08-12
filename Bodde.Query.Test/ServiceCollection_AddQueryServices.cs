@@ -211,7 +211,17 @@ public class ServiceCollection_AddQueryServices
             throw new NotImplementedException();
         }
 
+        public FilterCriteria.FilterExpression? ParseFilterExpression(string filterString)
+        {
+            throw new NotImplementedException();
+        }
+
         public OrderByCriteria? ParseOrderBy(string orderByString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString)
         {
             throw new NotImplementedException();
         }
