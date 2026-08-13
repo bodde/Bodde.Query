@@ -5,17 +5,19 @@ namespace Bodde.Query.Abstractions.Services;
 
 public interface IQueryCriteriaParser
 {
-    PagingCriteria? ParsePaging(string pagingString);
+    QueryCriteria Parse(string criteriaString);
 
-    FilterCriteria? ParseFilter(string filterString);
+    QueryCriteria Parse(string? filter = null, string? orderBy = null, int? skip = null, int? top = null, bool? totalCount = null);
+    
+    QueryCriteria Parse(QueryCriteriaParameters queryCriteriaParameters);
 
-    FilterCriteria.FilterExpression? ParseFilterExpression(string filterString);
+    PagingCriteria ParsePaging(string pagingString);
 
-    OrderByCriteria? ParseOrderBy(string orderByString);
+    FilterCriteria ParseFilter(string filterString);
+
+    FilterCriteria.FilterExpression ParseFilterExpression(string filterString);
+
+    OrderByCriteria ParseOrderBy(string orderByString);
 
     OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString);
-
-    QueryCriteria? Parse(string criteriaString);
-    
-    QueryCriteria? Parse(QueryCriteriaParameters? queryCriteriaParameters);
 }

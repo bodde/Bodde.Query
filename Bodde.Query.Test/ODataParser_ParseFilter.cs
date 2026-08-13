@@ -14,16 +14,11 @@ public class ODataParser_ParseFilter
     }
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("$filter=")]
-    public void EmptyString_NullCriteria(string? input)
+    public void EmptyString_Throw_FormatException(string input)
     {
-#pragma warning disable CS8604 // Possible null reference argument.
-        var result = sut.ParseFilter(input);
-#pragma warning restore CS8604 // Possible null reference argument.
-
-        Assert.Null(result);
+        Assert.Throws<FormatException>(() => sut.ParseFilter(input));
     }
 
     [Fact]

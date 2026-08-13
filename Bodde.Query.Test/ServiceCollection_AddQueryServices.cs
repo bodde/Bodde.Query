@@ -196,27 +196,32 @@ public class ServiceCollection_AddQueryServices
 
     private class CustomQueryCriteriaParser : IQueryCriteriaParser
     {
-        public QueryCriteria? Parse(string criteriaString)
+        public QueryCriteria Parse(string criteriaString)
         {
             throw new NotImplementedException();
         }
 
-        public QueryCriteria? Parse(QueryCriteriaParameters? queryCriteriaParameters)
+        public QueryCriteria Parse(QueryCriteriaParameters? queryCriteriaParameters)
         {
             throw new NotImplementedException();
         }
 
-        public FilterCriteria? ParseFilter(string filterString)
+        public QueryCriteria Parse(string? filter = null, string? orderBy = null, int? skip = null, int? top = null, bool? totalCount = null)
         {
             throw new NotImplementedException();
         }
 
-        public FilterCriteria.FilterExpression? ParseFilterExpression(string filterString)
+        public FilterCriteria ParseFilter(string filterString)
         {
             throw new NotImplementedException();
         }
 
-        public OrderByCriteria? ParseOrderBy(string orderByString)
+        public FilterCriteria.FilterExpression ParseFilterExpression(string filterString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public OrderByCriteria ParseOrderBy(string orderByString)
         {
             throw new NotImplementedException();
         }
@@ -226,7 +231,7 @@ public class ServiceCollection_AddQueryServices
             throw new NotImplementedException();
         }
 
-        public PagingCriteria? ParsePaging(string pagingString)
+        public PagingCriteria ParsePaging(string pagingString)
         {
             throw new NotImplementedException();
         }

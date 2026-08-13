@@ -119,12 +119,14 @@ internal class QueryCriteriaHandler(
 
     private IQueryable<T> ApplyPageCriteria<T>(IQueryable<T> query, PagingCriteria criteria)
     {
-        if (criteria.Skip.HasValue == true)
+        var defaultPagingCriteria = new PagingCriteria();
+
+        if (criteria.Skip.HasValue)
         {
             query = query.Skip(criteria.Skip.Value);
         }
 
-        if (criteria.Top.HasValue == true)
+        if (criteria.Top.HasValue)
         {
             query = query.Take(criteria.Top.Value);
         }
