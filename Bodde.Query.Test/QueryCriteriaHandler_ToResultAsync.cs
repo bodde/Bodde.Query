@@ -30,7 +30,7 @@ public class QueryCriteriaHandler_ToResultAsync
 
         queryToolkit = new Mock<IQueryToolkit>();
         queryToolkit.SetupGet(_ => _.Executor).Returns(queryExecutor.Object);
-        
+
         sut = new QueryCriteriaHandler(new ExpressionBuilder(), queryToolkit.Object);
     }
 
@@ -95,7 +95,7 @@ public class QueryCriteriaHandler_ToResultAsync
         var expectedData = criteriaQueryable.ToArray();
         var expectedTotalCount = sut.ApplyCriteria(data, filteredQueryCriteria).Count();
 
-        var actual = await sut.ToResultAsync(criteriaQueryable);
+        var actual = await sut.ToResultAsync(data, fullQueryCriteria);
 
         Assert.Equal(expectedData.GetIdsCsv(), actual.Items.GetIdsCsv());
         Assert.Equal(expectedTotalCount, actual.TotalCount);
@@ -117,7 +117,7 @@ public class QueryCriteriaHandler_ToResultAsync
         var criteriaQueryable = sut.ApplyCriteria(data, fullQueryCriteria);
         var expectedData = criteriaQueryable.ToArray();
 
-        var actual = await sut.ToResultAsync(criteriaQueryable);
+        var actual = await sut.ToResultAsync(data, fullQueryCriteria);
 
         Assert.Equal(expectedData.GetIdsCsv(), actual.Items.GetIdsCsv());
         Assert.Null(actual.TotalCount);

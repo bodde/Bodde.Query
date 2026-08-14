@@ -11,8 +11,7 @@ public class QueryCriteriaQueryable_IQueryable
         var queryCriteria = new QueryCriteria();
         var queryToolkit = new DefaultQueryToolkit();
         var originalQuery = Array.Empty<int>().AsQueryable();
-        var queryWithCriteria = Array.Empty<int>().AsQueryable();
-        var sut = new QueryableWithCriteria<int>(queryToolkit, originalQuery, queryCriteria, queryWithCriteria);
+        var sut = new QueryableWithCriteria<int>(queryToolkit, originalQuery, queryCriteria);
 
         var actualQueryCriteria = sut.QueryCriteria;
         var actualElementType = sut.ElementType;
@@ -22,9 +21,9 @@ public class QueryCriteriaQueryable_IQueryable
         var actualEnumeratorNonGeneric = ((System.Collections.IEnumerable)sut).GetEnumerator();
 
         Assert.Equal(queryCriteria, actualQueryCriteria);
-        Assert.Equal(queryWithCriteria.ElementType, actualElementType);
-        Assert.Equal(queryWithCriteria.Expression, actualExpression);
-        Assert.Equal(queryWithCriteria.Provider, actualProvider);
+        Assert.Equal(originalQuery.ElementType, actualElementType);
+        Assert.Equal(originalQuery.Expression, actualExpression);
+        Assert.Equal(originalQuery.Provider, actualProvider);
         Assert.NotNull(actualEnumerator);
         Assert.NotNull(actualEnumeratorNonGeneric);
     }

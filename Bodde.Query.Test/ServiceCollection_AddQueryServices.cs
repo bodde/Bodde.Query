@@ -137,7 +137,7 @@ public class ServiceCollection_AddQueryServices
 
     private class CustomQueryCriteriaHandler : IQueryCriteriaHandler
     {
-        public QueryableWithCriteria<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria)
+        public IQueryable<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria)
         {
             throw new NotImplementedException();
         }

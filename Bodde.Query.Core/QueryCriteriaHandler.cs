@@ -9,7 +9,7 @@ internal class QueryCriteriaHandler(
     IQueryToolkit queryToolkit
     ) : IQueryCriteriaHandler
 {
-    public QueryableWithCriteria<T> ApplyCriteria<T>(IQueryable<T> originalQuery, QueryCriteria criteria)
+    public IQueryable<T> ApplyCriteria<T>(IQueryable<T> originalQuery, QueryCriteria criteria)
     {
         var queryWithCriteria = criteria.Filter != null 
             ? ApplyFilterCriteria(originalQuery, criteria.Filter) 
@@ -23,24 +23,24 @@ internal class QueryCriteriaHandler(
             ? ApplyPageCriteria(queryWithCriteria, criteria.Paging) 
             : queryWithCriteria;
 
-        return new QueryableWithCriteria<T>(queryToolkit, originalQuery, criteria, queryWithCriteria);
+        return queryWithCriteria;
     }
 
     public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(
-        QueryableWithCriteria<T> query,
+        QueryableWithCriteria<T> queryableWithCriteria,
         CancellationToken cancellationToken = default
     )
     {
-        var result = await queryToolkit.Executor.ToArrayAsync(query, cancellationToken);
-        var requiresTotalCount = query.QueryCriteria.Paging?.TotalCount == true;
+        var result = await queryToolkit.Executor.ToArrayAsync(queryableWithCriteria, cancellationToken);
+        var requiresTotalCount = queryableWithCriteria.QueryCriteria.Paging?.TotalCount == true;
         if(!requiresTotalCount)
         {
             return new QueryCriteriaResult<T>(result, null);
         }
 
-        var queryForCount = query.QueryCriteria.Filter != null 
-            ? ApplyFilterCriteria(query.OriginalQueryable, query.QueryCriteria.Filter) 
-            : query.OriginalQueryable;
+        var queryForCount = queryableWithCriteria.QueryCriteria.Filter != null 
+            ? ApplyFilterCriteria(queryableWithCriteria.Queryable, queryableWithCriteria.QueryCriteria.Filter) 
+            : queryableWithCriteria.Queryable;
 
         var totalCount = await queryToolkit.Executor.CountAsync(queryForCount, cancellationToken);
 

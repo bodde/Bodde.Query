@@ -5,18 +5,13 @@ using Bodde.Query.Abstractions.Services;
 
 namespace Bodde.Query.Abstractions.Models;
 
-public class QueryableWithCriteria<TItem>(
-    IQueryToolkit toolkit,
-    IQueryable<TItem> queryable, 
-    QueryCriteria queryCriteria,
-    IQueryable<TItem> queryableWithCriteria) 
+public record QueryableWithCriteria<TItem>(
+    IQueryToolkit Toolkit,
+    IQueryable<TItem> Queryable, 
+    QueryCriteria QueryCriteria) 
     : IQueryable<TItem>
 {
-    public IQueryToolkit Toolkit { get; } = toolkit;
-
-    public IQueryable<TItem> OriginalQueryable { get; } = queryable;
-
-    public QueryCriteria QueryCriteria { get; } = queryCriteria;
+    IQueryable<TItem> queryableWithCriteria = Toolkit.Handler.ApplyCriteria(Queryable, QueryCriteria);
 
     public Type ElementType => queryableWithCriteria.ElementType;
 

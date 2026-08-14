@@ -5,9 +5,12 @@ using static Bodde.Query.Abstractions.Models.FilterCriteria;
 
 var departments = DataSeeder.SeedDepartments();
 var data = DataSeeder.SeedEmployees(departments).AsQueryable();
-var filteredData = data;
 
 var queryToolkit = new DefaultQueryToolkit();
+
+var dataWithCriteria = data.AsQueryableWithCriteria(queryToolkit);
+
+
 
 
 var employeesNamedJohn = queryToolkit.Parser.Parse(filter: "Name startswith 'John'");
@@ -21,6 +24,7 @@ var commands = new (string name, Func<QueryCriteria, QueryCriteria> updateCriter
 };
 
 var queryCriteria = new QueryCriteria();
+var filteredData = data;
 
 while (true)
 {
