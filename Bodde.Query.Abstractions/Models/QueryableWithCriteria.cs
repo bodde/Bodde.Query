@@ -6,9 +6,11 @@ using Bodde.Query.Abstractions.Services;
 namespace Bodde.Query.Abstractions.Models;
 
 public record QueryableWithCriteria<TItem>(
+    string Name,
     IQueryToolkit Toolkit,
     IQueryable<TItem> Queryable, 
-    QueryCriteria Criteria) 
+    QueryCriteria Criteria
+    ) 
     : IQueryable<TItem>
 {
     IQueryable<TItem> queryableWithCriteria = Toolkit.Handler.ApplyCriteria(Queryable, Criteria);
@@ -20,6 +22,14 @@ public record QueryableWithCriteria<TItem>(
     public IQueryProvider Provider => queryableWithCriteria.Provider;
 
     public IEnumerator<TItem> GetEnumerator() => queryableWithCriteria.GetEnumerator();
+
+    public override string ToString()
+    {
+        var name = string.IsNullOrWhiteSpace(Name) ? "<unnamed>" : Name;
+        var criteria = Toolkit.Formatter.Format(Criteria);
+
+        return $"{name} ({criteria})";
+    }
 
     IEnumerator IEnumerable.GetEnumerator() => queryableWithCriteria.GetEnumerator();
 }

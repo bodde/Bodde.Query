@@ -28,12 +28,13 @@ internal class QueryCriteriaHandler(
 
     public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> queryableWithCriteria)
     {
+        var name = queryableWithCriteria.ToString();
         var criteria = queryableWithCriteria.Criteria;
         var result = queryableWithCriteria.ToArray();
         var requiresTotalCount = criteria.Paging?.TotalCount == true;
         if(!requiresTotalCount)
         {
-            return new QueryCriteriaResult<T>(criteria, result, null);
+            return new QueryCriteriaResult<T>(name, criteria, result, null);
         }
 
         var queryForCount = queryableWithCriteria.Criteria.Filter != null 
@@ -42,7 +43,7 @@ internal class QueryCriteriaHandler(
 
         var totalCount = queryForCount.Count();
 
-        return new QueryCriteriaResult<T>(criteria, result, totalCount);
+        return new QueryCriteriaResult<T>(name, criteria, result, totalCount);
     }
 
 
@@ -51,12 +52,13 @@ internal class QueryCriteriaHandler(
         CancellationToken cancellationToken = default
     )
     {
+        var name = queryableWithCriteria.ToString();
         var criteria = queryableWithCriteria.Criteria;
         var result = await queryToolkit.Executor.ToArrayAsync(queryableWithCriteria, cancellationToken);
         var requiresTotalCount = criteria.Paging?.TotalCount == true;
         if(!requiresTotalCount)
         {
-            return new QueryCriteriaResult<T>(criteria, result, null);
+            return new QueryCriteriaResult<T>(name, criteria, result, null);
         }
 
         var queryForCount = criteria.Filter != null 
@@ -65,35 +67,7 @@ internal class QueryCriteriaHandler(
 
         var totalCount = await queryToolkit.Executor.CountAsync(queryForCount, cancellationToken);
 
-        return new QueryCriteriaResult<T>(criteria, result, totalCount);
-    }
-
-    public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(
-        IQueryable<T> query,
-        QueryCriteria queryCriteria,
-        CancellationToken cancellationToken = default
-    )
-    {
-        query = queryCriteria.Filter != null 
-            ? ApplyFilterCriteria(query, queryCriteria.Filter) 
-            : query;
-
-        var requiresTotalCount = queryCriteria.Paging?.TotalCount == true;
-        var totalCount = requiresTotalCount 
-            ? await queryToolkit.Executor.CountAsync(query, cancellationToken) 
-            : (int?)null;
-
-        query = queryCriteria.OrderBy != null 
-            ? ApplyOrderByCriteria(query, queryCriteria.OrderBy) 
-            : query;
-
-        query = queryCriteria.Paging != null 
-            ? ApplyPageCriteria(query, queryCriteria.Paging) 
-            : query;
-
-        var result = await queryToolkit.Executor.ToArrayAsync(query, cancellationToken);
-
-        return new QueryCriteriaResult<T>(queryCriteria, result, totalCount);
+        return new QueryCriteriaResult<T>(name, criteria, result, totalCount);
     }
 
     private IQueryable<T> ApplyFilterCriteria<T>(IQueryable<T> query, FilterCriteria filter)
@@ -140,8 +114,6 @@ internal class QueryCriteriaHandler(
 
     private IQueryable<T> ApplyPageCriteria<T>(IQueryable<T> query, PagingCriteria criteria)
     {
-        var defaultPagingCriteria = new PagingCriteria();
-
         if (criteria.Skip.HasValue)
         {
             query = query.Skip(criteria.Skip.Value);

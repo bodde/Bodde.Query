@@ -12,11 +12,4 @@ public interface IQueryCriteriaHandler
         QueryableWithCriteria<T> query,
         CancellationToken cancellationToken = default
         );
-        
-    Task<QueryCriteriaResult<T>> ToResultAsync<T>(
-        IQueryable<T> query, 
-        QueryCriteria criteria,
-        CancellationToken cancellationToken = default
-        );
-   
 }

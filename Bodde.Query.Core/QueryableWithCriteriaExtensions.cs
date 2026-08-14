@@ -22,12 +22,29 @@ public static class QueryableWithCriteriaExtensions
             );
 
             return new QueryableWithCriteria<T>(
+                query.Name,
                 query.Toolkit,
                 query.Queryable,
                 newCriteria
             );
         }
-    
+
+        public QueryableWithCriteria<T> Paging(int skip, int top, bool totalCount = true)
+        {
+            var newCriteria = new QueryCriteria(
+                Filter: query.Criteria.Filter,
+                OrderBy: query.Criteria.OrderBy,
+                Paging: new PagingCriteria(skip, top, totalCount)
+            );
+
+            return new QueryableWithCriteria<T>(
+                query.Name,
+                query.Toolkit,
+                query.Queryable,
+                newCriteria
+            );
+        }
+
         public QueryCriteriaResult<T> ToResult()
             => query.Toolkit.Handler.ToResult(query);
     }
