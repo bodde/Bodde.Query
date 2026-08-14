@@ -26,25 +26,46 @@ internal class QueryCriteriaHandler(
         return queryWithCriteria;
     }
 
+    public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> queryableWithCriteria)
+    {
+        var criteria = queryableWithCriteria.Criteria;
+        var result = queryableWithCriteria.ToArray();
+        var requiresTotalCount = criteria.Paging?.TotalCount == true;
+        if(!requiresTotalCount)
+        {
+            return new QueryCriteriaResult<T>(criteria, result, null);
+        }
+
+        var queryForCount = queryableWithCriteria.Criteria.Filter != null 
+            ? ApplyFilterCriteria(queryableWithCriteria.Queryable, queryableWithCriteria.Criteria.Filter) 
+            : queryableWithCriteria.Queryable;
+
+        var totalCount = queryForCount.Count();
+
+        return new QueryCriteriaResult<T>(criteria, result, totalCount);
+    }
+
+
     public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(
         QueryableWithCriteria<T> queryableWithCriteria,
         CancellationToken cancellationToken = default
     )
     {
+        var criteria = queryableWithCriteria.Criteria;
         var result = await queryToolkit.Executor.ToArrayAsync(queryableWithCriteria, cancellationToken);
-        var requiresTotalCount = queryableWithCriteria.QueryCriteria.Paging?.TotalCount == true;
+        var requiresTotalCount = criteria.Paging?.TotalCount == true;
         if(!requiresTotalCount)
         {
-            return new QueryCriteriaResult<T>(result, null);
+            return new QueryCriteriaResult<T>(criteria, result, null);
         }
 
-        var queryForCount = queryableWithCriteria.QueryCriteria.Filter != null 
-            ? ApplyFilterCriteria(queryableWithCriteria.Queryable, queryableWithCriteria.QueryCriteria.Filter) 
+        var queryForCount = criteria.Filter != null 
+            ? ApplyFilterCriteria(queryableWithCriteria.Queryable, criteria.Filter) 
             : queryableWithCriteria.Queryable;
 
         var totalCount = await queryToolkit.Executor.CountAsync(queryForCount, cancellationToken);
 
-        return new QueryCriteriaResult<T>(result, totalCount);
+        return new QueryCriteriaResult<T>(criteria, result, totalCount);
     }
 
     public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(
@@ -72,7 +93,7 @@ internal class QueryCriteriaHandler(
 
         var result = await queryToolkit.Executor.ToArrayAsync(query, cancellationToken);
 
-        return new QueryCriteriaResult<T>(result, totalCount);
+        return new QueryCriteriaResult<T>(queryCriteria, result, totalCount);
     }
 
     private IQueryable<T> ApplyFilterCriteria<T>(IQueryable<T> query, FilterCriteria filter)

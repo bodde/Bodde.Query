@@ -13,7 +13,7 @@ public class QueryCriteriaQueryable_IQueryable
         var originalQuery = Array.Empty<int>().AsQueryable();
         var sut = new QueryableWithCriteria<int>(queryToolkit, originalQuery, queryCriteria);
 
-        var actualQueryCriteria = sut.QueryCriteria;
+        var actualQueryCriteria = sut.Criteria;
         var actualElementType = sut.ElementType;
         var actualExpression = sut.Expression;
         var actualProvider = sut.Provider;

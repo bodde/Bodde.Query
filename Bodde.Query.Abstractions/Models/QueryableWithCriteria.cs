@@ -8,10 +8,10 @@ namespace Bodde.Query.Abstractions.Models;
 public record QueryableWithCriteria<TItem>(
     IQueryToolkit Toolkit,
     IQueryable<TItem> Queryable, 
-    QueryCriteria QueryCriteria) 
+    QueryCriteria Criteria) 
     : IQueryable<TItem>
 {
-    IQueryable<TItem> queryableWithCriteria = Toolkit.Handler.ApplyCriteria(Queryable, QueryCriteria);
+    IQueryable<TItem> queryableWithCriteria = Toolkit.Handler.ApplyCriteria(Queryable, Criteria);
 
     public Type ElementType => queryableWithCriteria.ElementType;
 
