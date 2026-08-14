@@ -6,7 +6,7 @@ namespace Bodde.Query.Core;
 
 internal class QueryCriteriaHandler(
     IExpressionBuilder expressionBuilder, 
-    IQueryExecutor queryExecutor
+    IQueryToolkit queryToolkit
     ) : IQueryCriteriaHandler
 {
     public QueryableWithCriteria<T> ApplyCriteria<T>(IQueryable<T> originalQuery, QueryCriteria criteria)
@@ -23,7 +23,7 @@ internal class QueryCriteriaHandler(
             ? ApplyPageCriteria(queryWithCriteria, criteria.Paging) 
             : queryWithCriteria;
 
-        return new QueryableWithCriteria<T>(originalQuery, criteria, queryWithCriteria);
+        return new QueryableWithCriteria<T>(queryToolkit, originalQuery, criteria, queryWithCriteria);
     }
 
     public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(
@@ -31,7 +31,7 @@ internal class QueryCriteriaHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var result = await queryExecutor.ToArrayAsync(query, cancellationToken);
+        var result = await queryToolkit.Executor.ToArrayAsync(query, cancellationToken);
         var requiresTotalCount = query.QueryCriteria.Paging?.TotalCount == true;
         if(!requiresTotalCount)
         {
@@ -39,10 +39,10 @@ internal class QueryCriteriaHandler(
         }
 
         var queryForCount = query.QueryCriteria.Filter != null 
-            ? ApplyFilterCriteria(query.OriginalQuery, query.QueryCriteria.Filter) 
-            : query.OriginalQuery;
+            ? ApplyFilterCriteria(query.OriginalQueryable, query.QueryCriteria.Filter) 
+            : query.OriginalQueryable;
 
-        var totalCount = await queryExecutor.CountAsync(queryForCount, cancellationToken);
+        var totalCount = await queryToolkit.Executor.CountAsync(queryForCount, cancellationToken);
 
         return new QueryCriteriaResult<T>(result, totalCount);
     }
@@ -59,7 +59,7 @@ internal class QueryCriteriaHandler(
 
         var requiresTotalCount = queryCriteria.Paging?.TotalCount == true;
         var totalCount = requiresTotalCount 
-            ? await queryExecutor.CountAsync(query, cancellationToken) 
+            ? await queryToolkit.Executor.CountAsync(query, cancellationToken) 
             : (int?)null;
 
         query = queryCriteria.OrderBy != null 
@@ -70,7 +70,7 @@ internal class QueryCriteriaHandler(
             ? ApplyPageCriteria(query, queryCriteria.Paging) 
             : query;
 
-        var result = await queryExecutor.ToArrayAsync(query, cancellationToken);
+        var result = await queryToolkit.Executor.ToArrayAsync(query, cancellationToken);
 
         return new QueryCriteriaResult<T>(result, totalCount);
     }

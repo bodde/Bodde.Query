@@ -7,7 +7,7 @@ var departments = DataSeeder.SeedDepartments();
 var data = DataSeeder.SeedEmployees(departments).AsQueryable();
 var filteredData = data;
 
-var queryToolkit = new QueryToolkit();
+var queryToolkit = new DefaultQueryToolkit();
 
 
 var employeesNamedJohn = queryToolkit.Parser.Parse(filter: "Name startswith 'John'");

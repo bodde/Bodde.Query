@@ -12,6 +12,7 @@ namespace Bodde.Query.Test;
 public class QueryCriteriaHandler_ToResultAsync
 {
     private readonly Mock<IQueryExecutor> queryExecutor;
+    private readonly Mock<IQueryToolkit> queryToolkit;
     private readonly QueryCriteriaHandler sut;
 
     public QueryCriteriaHandler_ToResultAsync()
@@ -26,8 +27,11 @@ public class QueryCriteriaHandler_ToResultAsync
             .CountAsync(It.IsAny<IQueryable<Employee>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((IQueryable<Employee> q, CancellationToken ct) => q.Count()
             );
+
+        queryToolkit = new Mock<IQueryToolkit>();
+        queryToolkit.SetupGet(_ => _.Executor).Returns(queryExecutor.Object);
         
-        sut = new QueryCriteriaHandler(new ExpressionBuilder(), queryExecutor.Object);
+        sut = new QueryCriteriaHandler(new ExpressionBuilder(), queryToolkit.Object);
     }
 
 

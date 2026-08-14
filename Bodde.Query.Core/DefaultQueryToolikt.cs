@@ -1,7 +1,7 @@
 using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Core;
 
-public class QueryToolkit(
+public class DefaultQueryToolkit(
     IQueryCriteriaParser? queryCriteriaParser = null,
     IQueryCriteriaFormatter? queryCriteriaFormatter = null,
     IExpressionBuilder? expressionBuilder = null,
@@ -13,7 +13,7 @@ public class QueryToolkit(
 
     public IQueryCriteriaParser Parser => queryCriteriaParser ?? new ODataParser();
 
-    public IQueryCriteriaHandler Handler => queryCriteriaHandler ?? new QueryCriteriaHandler(ExpressionBuilder, Executor);
+    public IQueryCriteriaHandler Handler => queryCriteriaHandler ?? new QueryCriteriaHandler(ExpressionBuilder, this);
 
     public IQueryExecutor Executor => queryExecutor ?? new DefaultQueryExecutor();
 

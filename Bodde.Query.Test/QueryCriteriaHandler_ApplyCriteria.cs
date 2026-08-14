@@ -18,7 +18,7 @@ public class QueryCriteriaHandler_ApplyCriteria
     public QueryCriteriaHandler_ApplyCriteria()
     {
         data = EmployeeSetBuilder.Build().AsQueryable();
-        sut = new QueryCriteriaHandler(new ExpressionBuilder(), new Mock<IQueryExecutor>().Object);
+        sut = new QueryCriteriaHandler(new ExpressionBuilder(), new Mock<IQueryToolkit>().Object);
     }
 
     [Fact]
