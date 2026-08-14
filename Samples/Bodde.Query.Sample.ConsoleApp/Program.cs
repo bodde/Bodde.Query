@@ -7,16 +7,18 @@ var employees = DataSeeder.SeedEmployees(departments).AsQueryable();
 var employeesWithCriteria = employees.AsQueryableWithCriteria("Employees", queryToolkit);
 
 Paginate(employeesWithCriteria, page: 1, pageSize: 10);
+EmployeesNamedJohn(employeesWithCriteria);
 
 void Paginate(QueryableWithCriteria<Employee> employeesWithCriteria, int page, int pageSize)
 {
-    while(true)
+    while (true)
     {
         var skip = (page - 1) * pageSize;
         var employeesPage = employeesWithCriteria
-            .Paging(skip: skip, top: pageSize)
+            .WithPaging(skip: skip, top: pageSize)
+            .WithName($"{employeesWithCriteria.Name} - Page {page}")
             .ToResult();
-        
+
         ShowResults(employeesPage);
 
         if (skip + pageSize >= employeesPage.TotalCount!)
@@ -26,12 +28,15 @@ void Paginate(QueryableWithCriteria<Employee> employeesWithCriteria, int page, i
     }
 }
 
-var employeesNamedJohn = employees
-    .AsQueryableWithCriteria("Employees named John", queryToolkit)
-    .Filter("Name startswith 'John'")
-    .ToResult();
+void EmployeesNamedJohn(QueryableWithCriteria<Employee> employeesWithCriteria)
+{
+    var employeesNamedJohn = employeesWithCriteria
+        .WithName("Employees named John")
+        .WithFilter("Name startswith 'John'")
+        .ToResult();
 
-ShowResults(employeesNamedJohn);
+    ShowResults(employeesNamedJohn);
+}
 
 void ShowResults(QueryCriteriaResult<Employee> result)
 {

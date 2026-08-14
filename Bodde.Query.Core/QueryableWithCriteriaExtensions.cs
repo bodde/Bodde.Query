@@ -5,7 +5,15 @@ public static class QueryableWithCriteriaExtensions
 {
     extension<T>(QueryableWithCriteria<T> query)
     {
-        public QueryableWithCriteria<T> Filter(string filterStatement)
+        public QueryableWithCriteria<T> WithName(string name)
+            => new(
+                name,
+                query.Toolkit,
+                query.Queryable,
+                query.Criteria
+            );
+
+        public QueryableWithCriteria<T> WithFilter(string filterStatement)
         {
             var filterExpression = query.Toolkit.Parser.ParseFilterExpression(filterStatement);
             if (filterExpression is null)
@@ -29,7 +37,7 @@ public static class QueryableWithCriteriaExtensions
             );
         }
 
-        public QueryableWithCriteria<T> Paging(int skip, int top, bool totalCount = true)
+        public QueryableWithCriteria<T> WithPaging(int skip, int top, bool totalCount = true)
         {
             var newCriteria = new QueryCriteria(
                 Filter: query.Criteria.Filter,
