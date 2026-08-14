@@ -11,7 +11,7 @@ public class QueryCriteriaQueryable_IQueryable
         var queryCriteria = new QueryCriteria();
         var originalQuery = Array.Empty<int>().AsQueryable();
         var queryWithCriteria = Array.Empty<int>().AsQueryable();
-        var sut = new QueryCriteriaQueryable<int>(originalQuery, queryCriteria, queryWithCriteria);
+        var sut = new QueryableWithCriteria<int>(originalQuery, queryCriteria, queryWithCriteria);
 
         var actualQueryCriteria = sut.QueryCriteria;
         var actualElementType = sut.ElementType;

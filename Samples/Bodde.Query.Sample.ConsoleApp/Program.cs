@@ -9,6 +9,10 @@ var filteredData = data;
 
 var queryToolkit = new QueryToolkit();
 
+
+var employeesNamedJohn = queryToolkit.Parser.Parse(filter: "Name startswith 'John'");
+var filteredData1 = await queryToolkit.Handler.ToResultAsync(data, employeesNamedJohn);
+
 var commands = new (string name, Func<QueryCriteria, QueryCriteria> updateCriteria)[]
 {
     ( "Reset", ResetCriteriaCommand),

@@ -9,7 +9,7 @@ internal class QueryCriteriaHandler(
     IQueryExecutor queryExecutor
     ) : IQueryCriteriaHandler
 {
-    public QueryCriteriaQueryable<T> ApplyCriteria<T>(IQueryable<T> originalQuery, QueryCriteria criteria)
+    public QueryableWithCriteria<T> ApplyCriteria<T>(IQueryable<T> originalQuery, QueryCriteria criteria)
     {
         var queryWithCriteria = criteria.Filter != null 
             ? ApplyFilterCriteria(originalQuery, criteria.Filter) 
@@ -23,11 +23,11 @@ internal class QueryCriteriaHandler(
             ? ApplyPageCriteria(queryWithCriteria, criteria.Paging) 
             : queryWithCriteria;
 
-        return new QueryCriteriaQueryable<T>(originalQuery, criteria, queryWithCriteria);
+        return new QueryableWithCriteria<T>(originalQuery, criteria, queryWithCriteria);
     }
 
     public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(
-        QueryCriteriaQueryable<T> query,
+        QueryableWithCriteria<T> query,
         CancellationToken cancellationToken = default
     )
     {

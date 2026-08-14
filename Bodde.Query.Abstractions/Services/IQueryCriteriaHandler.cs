@@ -5,10 +5,10 @@ namespace Bodde.Query.Abstractions.Services;
 
 public interface IQueryCriteriaHandler
 {
-    QueryCriteriaQueryable<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria);
+    QueryableWithCriteria<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria);
  
     Task<QueryCriteriaResult<T>> ToResultAsync<T>(
-        QueryCriteriaQueryable<T> query,
+        QueryableWithCriteria<T> query,
         CancellationToken cancellationToken = default
         );
         

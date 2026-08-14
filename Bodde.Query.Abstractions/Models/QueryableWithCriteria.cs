@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace Bodde.Query.Abstractions.Models;
 
-public class QueryCriteriaQueryable<TItem>(
+public class QueryableWithCriteria<TItem>(
     IQueryable<TItem> originalQuery, 
     QueryCriteria queryCriteria,
     IQueryable<TItem> queryWithCriteria) 

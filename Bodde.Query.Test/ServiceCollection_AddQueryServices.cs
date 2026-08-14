@@ -137,12 +137,12 @@ public class ServiceCollection_AddQueryServices
 
     private class CustomQueryCriteriaHandler : IQueryCriteriaHandler
     {
-        public QueryCriteriaQueryable<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria)
+        public QueryableWithCriteria<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria)
         {
             throw new NotImplementedException();
         }
 
-        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryCriteriaQueryable<T> query, CancellationToken cancellationToken = default)
+        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
