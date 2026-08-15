@@ -39,7 +39,7 @@ public static class DataSeeder
                     Department = department,
                     HireDate = hireDate,
                     Salary = 50000 - (id * 1000),
-                    IsActive = id % 5 == 0
+                    IsActive = id % 5 != 0
                 };
             }
         }

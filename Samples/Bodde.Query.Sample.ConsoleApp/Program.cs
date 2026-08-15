@@ -60,7 +60,7 @@ ShowResult(employeesFromHRByHireDateDescPage2.ToResult());
 
 var multipleCriteria = employeesWithCriteria
     .WithFilter("Department.Name in ('Human Resources', 'Engineering') or Salary gt 30000")
-    .WithFilter("HireDate ge 2021-01-01")   // filters can be combined using multiple WithFilter calls
+    .WithFilter("HireDate ge 2021-01-01 and IsActive eq true")   // filters can be combined using multiple WithFilter calls
     .WithOrderBy("Department.Name desc, HireDate")
     .WithPaging(skip: 0, top: 10)
     .WithName("Multiple criteria");
@@ -75,8 +75,9 @@ void ShowResult(QueryCriteriaResult<Employee> result)
         new(_ => _.Id), 
         new(_ => _.Name), 
         new(_ => _.Department!.Name, header: "Department"), 
-        new(_ => _.Salary), 
-        new(_ => _.HireDate, header: "Hire Date", valueFormatter: value => $"{value:yyyy-MM-dd}")
+        new(_ => _.Salary, valueFormatter: value => $"{value:C}"), 
+        new(_ => _.HireDate, header: "Hire Date", valueFormatter: value => $"{value:yyyy-MM-dd}"),
+        new(_ => _.IsActive, header: "Is Active")
         ));
 
     if(result.TotalCount.HasValue)

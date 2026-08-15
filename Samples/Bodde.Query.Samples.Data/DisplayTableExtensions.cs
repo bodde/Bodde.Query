@@ -1,14 +1,16 @@
 using System.Linq.Expressions;
 using System.Text;
 
+namespace Bodde.Query.Samples.Data;
+
 public static class DisplayTableExtensions
 {
     public class DisplayTableColumn<T>
     {
-        public DisplayTableColumn(Expression<Func<T, object>> columnSelector, string? header = null,Func<object?, string>? valueFormatter = null)
+        public DisplayTableColumn(Expression<Func<T, object>> columnSelector, string? header = null, Func<object?, string>? valueFormatter = null)
         {
             Header = header ?? GetPropertyName(columnSelector);
-            ValueSelector = columnSelector.Compile();
+            ValueSelector = columnSelector.AddTestForNull()!.Compile();
             ValueFormatter = valueFormatter;
 
             var propertyType = GetPropertyType(columnSelector);
@@ -20,7 +22,7 @@ public static class DisplayTableExtensions
         public Func<object?, string>? ValueFormatter { get; set; }
         public Func<T, object> ValueSelector { get; set; }
 
-        public bool RightAlign { get; set; }    
+        public bool RightAlign { get; set; }
     }
 
     public static string ToDisplayTable<T>(this IEnumerable<T> items, params DisplayTableColumn<T>[] columnSelectors)
@@ -37,7 +39,7 @@ public static class DisplayTableExtensions
 
         var sb = new StringBuilder();
         var rowLength = 0;
-        var spacing = 1;
+        var spacing = 2;
         for (var colIndex = 0; colIndex < columnCount; colIndex++)
         {
             var header = columnSelectors[colIndex].Header;
@@ -65,13 +67,13 @@ public static class DisplayTableExtensions
                 sb.Append(new string(' ', spacing));
             }
 
-            if(rowIndex < rows.Length - 1)
+            if (rowIndex < rows.Length - 1)
             {
-                sb.AppendLine();            
+                sb.AppendLine();
             }
         }
 
-        if(rows.Length == 0)
+        if (rows.Length == 0)
             sb.AppendLine("No data to display");
 
         return sb.ToString();
@@ -80,7 +82,7 @@ public static class DisplayTableExtensions
     private static int GetMaxColumnLength(string[][] values, int columnIndex)
     {
         var columnValues = GetColumnValues(values, columnIndex);
-        if(columnValues.Length == 0)
+        if (columnValues.Length == 0)
             return 0;
 
         return columnValues.Max(v => v.Length);
@@ -118,7 +120,7 @@ public static class DisplayTableExtensions
 
     private static MemberExpression[] GetMemberExpressions<T, TProperty>(Expression<Func<T, TProperty>> expression)
     {
-        if(expression.Body is UnaryExpression unaryExpression)
+        if (expression.Body is UnaryExpression unaryExpression)
         {
             return [(MemberExpression)unaryExpression.Operand];
         }
@@ -127,7 +129,7 @@ public static class DisplayTableExtensions
         {
             var memberExpressions = new List<MemberExpression>();
             var innerExpression = memberExpression.Expression as MemberExpression;
-            while(innerExpression != null)
+            while (innerExpression != null)
             {
                 memberExpressions.Add(innerExpression);
                 innerExpression = innerExpression.Expression as MemberExpression;
@@ -139,5 +141,38 @@ public static class DisplayTableExtensions
         }
 
         throw new ArgumentException("Expression is not a property access expression");
+    }
+
+}
+
+
+public static class ExpressionExtensions
+{
+    public static ExpressionType? AddTestForNull<ExpressionType>(this ExpressionType orig) 
+        where ExpressionType : Expression 
+        => (ExpressionType?)new NullTestVisitor().Visit(orig);
+}
+
+public static class TypeExtensions
+{
+    public static bool IsNullable(this Type type)
+        => type.IsClass || Nullable.GetUnderlyingType(type) != null;
+}
+
+/// <summary>
+/// ExpressionVisitor to replace a obj.member Expression with a null test ((obj == null) ? null : obj.member)
+/// </summary>
+public class NullTestVisitor : ExpressionVisitor
+{
+    public override Expression? Visit(Expression? node)
+    {
+        if (node is MemberExpression nme && nme.Expression != null && nme.Type.IsNullable())
+        {
+            var nullTestExpression = Expression.MakeBinary(ExpressionType.Equal, nme.Expression, Expression.Constant(null, nme.Expression.Type));
+
+            return Expression.Condition(nullTestExpression, Expression.Constant(null, nme.Type), nme);
+        }
+
+        return base.Visit(node);
     }
 }
