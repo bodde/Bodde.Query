@@ -28,7 +28,7 @@ internal class QueryCriteriaHandler(
 
     public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> queryableWithCriteria)
     {
-        var name = queryableWithCriteria.ToString();
+        var name = queryableWithCriteria.Name;
         var criteria = queryableWithCriteria.Criteria;
         var result = queryableWithCriteria.ToArray();
         var requiresTotalCount = criteria.Paging?.TotalCount == true;

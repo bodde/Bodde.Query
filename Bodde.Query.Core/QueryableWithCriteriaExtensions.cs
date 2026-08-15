@@ -38,6 +38,24 @@ public static class QueryableWithCriteriaExtensions
             );
         }
 
+        public QueryableWithCriteria<T> WithOrderBy(string orderByStatement)
+        {
+            var orderByCriteria = query.Toolkit.Parser.ParseOrderBy(orderByStatement);
+
+            var newCriteria = new QueryCriteria(
+                Filter: query.Criteria.Filter,
+                OrderBy: orderByCriteria,
+                Paging: query.Criteria.Paging
+            );
+
+            return new QueryableWithCriteria<T>(
+                query.Name,
+                query.Toolkit,
+                query.Queryable,
+                newCriteria
+            );
+        }
+
         public QueryableWithCriteria<T> WithPaging(int skip, int top, bool totalCount = true)
         {
             var newCriteria = new QueryCriteria(

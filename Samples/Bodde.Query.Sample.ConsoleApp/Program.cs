@@ -4,45 +4,82 @@ using Bodde.Query.Samples.Data;
 
 var queryToolkit = new DefaultQueryToolkit();
 var departments = DataSeeder.SeedDepartments();
-var employees = DataSeeder.SeedEmployees(departments).AsQueryable();
-var employeesWithCriteria = employees.WithCriteria("Employees", queryToolkit);
+var employees = DataSeeder.SeedEmployees(departments);
+var employeesWithCriteria = employees
+    .AsQueryable()
+    .WithCriteria(name: "Employees", queryToolkit);
 
-Paginate(employeesWithCriteria, page: 1, pageSize: 10);
-EmployeesNamedJohn(employeesWithCriteria);
+var page1 = employeesWithCriteria
+    .WithPaging(skip: 0, top: 10)
+    .WithName("Employees - Page 1");
 
-void Paginate(QueryableWithCriteria<Employee> employeesWithCriteria, int page, int pageSize)
+ShowResult(page1.ToResult());
+
+var page2 = employeesWithCriteria
+    .WithPaging(skip: 10, top: 10)
+    .WithName("Employees - Page 2");
+
+ShowResult(page2.ToResult());
+
+var page3 = employeesWithCriteria
+    .WithPaging(skip: 20, top: 10)
+    .WithName("Employees - Page 3");
+
+ShowResult(page3.ToResult());
+
+var page4 = employeesWithCriteria
+    .WithPaging(skip: 30, top: 10)
+    .WithName("Employees - Page 4");
+
+ShowResult(page4.ToResult());
+
+var employeesNamedJohn = employeesWithCriteria
+    .WithFilter("Name startswith 'John'")
+    .WithName("Employees named John");
+ShowResult(employeesNamedJohn.ToResult());
+
+var employeesByHireDateDesc = employeesWithCriteria
+    .WithOrderBy("HireDate desc")
+    .WithName("Employees by hire date (descending)");
+ShowResult(employeesByHireDateDesc.ToResult());
+
+var employeesFromHR = employeesWithCriteria
+    .WithFilter("Department.Name eq 'Human Resources'")
+    .WithName("Employees from HR");
+ShowResult(employeesFromHR.ToResult());
+
+var employeesFromHRByHireDateDesc = employeesFromHR
+    .WithOrderBy("HireDate desc")
+    .WithName("Employees from HR by hire date (descending)");
+ShowResult(employeesFromHRByHireDateDesc.ToResult());
+
+var employeesFromHRByHireDateDescPage2 = employeesFromHRByHireDateDesc
+    .WithPaging(skip: 10, top: 10)
+    .WithName("Employees from HR by hire date (descending) - Page 2");
+ShowResult(employeesFromHRByHireDateDescPage2.ToResult());
+
+var multipleCriteria = employeesWithCriteria
+    .WithFilter("Department.Name in ('Human Resources', 'Engineering') or Salary gt 30000")
+    .WithFilter("HireDate ge 2021-01-01")   // filters can be combined using multiple WithFilter calls
+    .WithOrderBy("Department.Name desc, HireDate")
+    .WithPaging(skip: 0, top: 10)
+    .WithName("Multiple criteria");
+
+ShowResult(multipleCriteria.ToResult());
+
+
+void ShowResult(QueryCriteriaResult<Employee> result)
 {
-    while (true)
+    Console.WriteLine($"{result.Name}:");
+    Console.WriteLine(result.Items.ToDisplayTable(_ => _.Id, _ => _.Name, _ => _.Department!.Name, _ => _.Salary, _ => _.HireDate));
+
+    if(result.TotalCount.HasValue)
     {
-        var skip = (page - 1) * pageSize;
-        var employeesPage = employeesWithCriteria
-            .WithPaging(skip: skip, top: pageSize)
-            .WithName($"{employeesWithCriteria.Name} - Page {page}")
-            .ToResult();
-
-        ShowResults(employeesPage);
-
-        if (skip + pageSize >= employeesPage.TotalCount!)
-            break;
-
-        page++;
+        Console.WriteLine($"Total Count: {result.TotalCount.Value}");
     }
-}
 
-void EmployeesNamedJohn(QueryableWithCriteria<Employee> employeesWithCriteria)
-{
-    var employeesNamedJohn = employeesWithCriteria
-        .WithName("Employees named John")
-        .WithFilter("Name startswith 'John'")
-        .ToResult();
+    var formattedQuery = queryToolkit.Formatter.Format(result.Criteria);
+    Console.WriteLine($"Formatted Query: {formattedQuery}");
 
-    ShowResults(employeesNamedJohn);
-}
-
-void ShowResults(QueryCriteriaResult<Employee> result)
-{
-    Console.Write(result.Name);
-    Console.WriteLine(":");
-
-    Console.WriteLine(result.Items.ToDisplayTable(_ => _.Id, _ => _.Name, _ => _.Department!.Name));
+    Console.WriteLine();
 }

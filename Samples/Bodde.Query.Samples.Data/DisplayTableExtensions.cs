@@ -9,7 +9,6 @@ public static class DisplayTableExtensions
         if (columnCount == 0)
             return "Please select at least one column to display";
 
-
         var headers = columnSelectors.Select(selector => GetPropertyName(selector)).ToArray();
         var columnValueSelectors = columnSelectors.Select(_ => _.Compile()).ToArray();
 
@@ -45,7 +44,10 @@ public static class DisplayTableExtensions
                 sb.Append(value.PadRight(columnLengthWithSpacing));
             }
 
-            sb.AppendLine();
+            if(rowIndex < rows.Length - 1)
+            {
+                sb.AppendLine();            
+            }
         }
 
         if(rows.Length == 0)
