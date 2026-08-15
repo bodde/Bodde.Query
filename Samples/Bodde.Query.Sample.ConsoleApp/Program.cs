@@ -71,7 +71,13 @@ ShowResult(multipleCriteria.ToResult());
 void ShowResult(QueryCriteriaResult<Employee> result)
 {
     Console.WriteLine($"{result.Name}:");
-    Console.WriteLine(result.Items.ToDisplayTable(_ => _.Id, _ => _.Name, _ => _.Department!.Name, _ => _.Salary, _ => _.HireDate));
+    Console.WriteLine(result.Items.ToDisplayTable(
+        new(_ => _.Id), 
+        new(_ => _.Name), 
+        new(_ => _.Department!.Name, header: "Department"), 
+        new(_ => _.Salary), 
+        new(_ => _.HireDate, header: "Hire Date", valueFormatter: value => $"{value:yyyy-MM-dd}")
+        ));
 
     if(result.TotalCount.HasValue)
     {
