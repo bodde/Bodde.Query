@@ -3,20 +3,20 @@ using Bodde.Query.Abstractions.Services;
 namespace Bodde.Query.Core;
 
 public class DefaultQueryToolkit(
-    IQueryCriteriaParser? queryCriteriaParser = null,
-    IQueryCriteriaFormatter? queryCriteriaFormatter = null,
+    IQueryCriteriaParser? parser = null,
+    IQueryCriteriaFormatter? formatter = null,
     IExpressionBuilder? expressionBuilder = null,
-    IQueryCriteriaHandler? queryCriteriaHandler = null,
-    IQueryExecutor? queryExecutor = null
+    IQueryCriteriaHandler? handler = null,
+    IQueryExecutor? executor = null
     ) : IQueryToolkit
 {
-    public IQueryCriteriaFormatter Formatter => queryCriteriaFormatter ?? new ODataFormatter();
+    public IQueryCriteriaFormatter Formatter => formatter ?? new ODataFormatter();
 
-    public IQueryCriteriaParser Parser => queryCriteriaParser ?? new ODataParser();
+    public IQueryCriteriaParser Parser => parser ?? new ODataParser();
 
-    public IQueryCriteriaHandler Handler => queryCriteriaHandler ?? new QueryCriteriaHandler(ExpressionBuilder, this);
+    public IQueryCriteriaHandler Handler => handler ?? new QueryCriteriaHandler(ExpressionBuilder, this);
 
-    public IQueryExecutor Executor => queryExecutor ?? new DefaultQueryExecutor();
+    public IQueryExecutor Executor => executor ?? new DefaultQueryExecutor();
 
     public IExpressionBuilder ExpressionBuilder => expressionBuilder ?? new ExpressionBuilder();
 }

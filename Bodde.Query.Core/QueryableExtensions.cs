@@ -13,6 +13,9 @@ public static class QueryableExtensions
         public QueryableWithCriteria<T> WithCriteria(string name, IQueryToolkit queryToolkit)
             => new(name, queryToolkit, query, new QueryCriteria());
 
+        public QueryableWithCriteria<T> WithCriteria(QueryCriteria criteria, IQueryToolkit queryToolkit)
+            => new(string.Empty, queryToolkit, query, criteria);
+
         public QueryableWithCriteria<T> WithCriteria(string name, QueryCriteria criteria, IQueryToolkit queryToolkit)
             => new(name, queryToolkit, query, criteria);
     }

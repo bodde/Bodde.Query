@@ -1,4 +1,3 @@
-using System;
 using Bodde.Query.Core;
 
 namespace Bodde.Query.Test;

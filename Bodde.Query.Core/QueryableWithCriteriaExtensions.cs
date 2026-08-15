@@ -7,15 +7,21 @@ public static class QueryableWithCriteriaExtensions
     extension<T>(QueryableWithCriteria<T> query)
     {
         public QueryableWithCriteria<T> WithName(string name)
-            => new(
+        {     
+            ArgumentNullException.ThrowIfNull(name);
+        
+            return new(
                 name,
                 query.Toolkit,
                 query.Queryable,
                 query.Criteria
             );
+        }
 
         public QueryableWithCriteria<T> WithFilter(string filterStatement)
         {
+            ArgumentNullException.ThrowIfNull(filterStatement);
+
             var filterExpression = query.Toolkit.Parser.ParseFilterExpression(filterStatement);
             if (filterExpression is null)
                 return query;
@@ -40,6 +46,8 @@ public static class QueryableWithCriteriaExtensions
 
         public QueryableWithCriteria<T> WithOrderBy(string orderByStatement)
         {
+            ArgumentNullException.ThrowIfNull(orderByStatement);
+
             var orderByCriteria = query.Toolkit.Parser.ParseOrderBy(orderByStatement);
 
             var newCriteria = new QueryCriteria(

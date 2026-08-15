@@ -13,15 +13,17 @@ public record QueryableWithCriteria<TItem>(
     ) 
     : IQueryable<TItem>
 {
-    IQueryable<TItem> queryableWithCriteria = Toolkit.Handler.ApplyCriteria(Queryable, Criteria);
+    private Lazy<IQueryable<TItem>> queryableWithCriteria = new Lazy<IQueryable<TItem>>(() => Toolkit.Handler.ApplyCriteria(Queryable, Criteria));
 
-    public Type ElementType => queryableWithCriteria.ElementType;
+    public Type ElementType => queryableWithCriteria.Value.ElementType;
 
-    public Expression Expression => queryableWithCriteria.Expression;
+    public Expression Expression => queryableWithCriteria.Value.Expression;
 
-    public IQueryProvider Provider => queryableWithCriteria.Provider;
+    public IQueryProvider Provider => queryableWithCriteria.Value.Provider;
 
-    public IEnumerator<TItem> GetEnumerator() => queryableWithCriteria.GetEnumerator();
+    public IEnumerator<TItem> GetEnumerator() => queryableWithCriteria.Value.GetEnumerator();
+    
+    IEnumerator IEnumerable.GetEnumerator() => queryableWithCriteria.Value.GetEnumerator();
 
     public override string ToString()
     {
@@ -31,5 +33,4 @@ public record QueryableWithCriteria<TItem>(
         return $"{name} ({criteria})";
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => queryableWithCriteria.GetEnumerator();
 }
