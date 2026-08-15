@@ -1,5 +1,7 @@
 using Bodde.Query.Abstractions.Services;
 
+namespace Bodde.Query.Core;
+
 internal class DefaultQueryExecutor : IQueryExecutor
     {
         public Task<int> CountAsync<T>(IQueryable<T> query, CancellationToken ct = default)

@@ -1,5 +1,5 @@
-using System;
 using Bodde.Query.Abstractions.Models;
+using Bodde.Query.Core;
 
 namespace Bodde.Query.Test;
 
@@ -11,7 +11,7 @@ public class QueryCriteriaQueryable_IQueryable
         var queryCriteria = new QueryCriteria();
         var queryToolkit = new DefaultQueryToolkit();
         var originalQuery = Array.Empty<int>().AsQueryable();
-        var sut = new QueryableWithCriteria<int>(queryToolkit, originalQuery, queryCriteria);
+        var sut = new QueryableWithCriteria<int>("Test", queryToolkit, originalQuery, queryCriteria);
 
         var actualQueryCriteria = sut.Criteria;
         var actualElementType = sut.ElementType;

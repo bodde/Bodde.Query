@@ -1,5 +1,6 @@
 using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Abstractions.Services;
+
+namespace Bodde.Query.Core;
 
 public static class QueryableWithCriteriaExtensions
 {

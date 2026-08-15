@@ -1,10 +1,11 @@
 ﻿using Bodde.Query.Abstractions.Models;
+using Bodde.Query.Core;
 using Bodde.Query.Samples.Data;
 
 var queryToolkit = new DefaultQueryToolkit();
 var departments = DataSeeder.SeedDepartments();
 var employees = DataSeeder.SeedEmployees(departments).AsQueryable();
-var employeesWithCriteria = employees.AsQueryableWithCriteria("Employees", queryToolkit);
+var employeesWithCriteria = employees.WithCriteria("Employees", queryToolkit);
 
 Paginate(employeesWithCriteria, page: 1, pageSize: 10);
 EmployeesNamedJohn(employeesWithCriteria);

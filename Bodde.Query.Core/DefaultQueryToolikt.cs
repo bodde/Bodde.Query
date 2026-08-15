@@ -1,5 +1,6 @@
 using Bodde.Query.Abstractions.Services;
-using Bodde.Query.Core;
+
+namespace Bodde.Query.Core;
 
 public class DefaultQueryToolkit(
     IQueryCriteriaParser? queryCriteriaParser = null,
