@@ -10,7 +10,7 @@ public class DefaultQueryToolkit_ctor
     [Fact]
     public async Task Default_Tools_AreAvailable()
     {
-        var sut = new DefaultQueryToolkit();
+        var sut = QueryToolkit.Default();
 
         var formatter = sut.Formatter;
         var parser = sut.Parser;
@@ -37,7 +37,7 @@ public class DefaultQueryToolkit_ctor
         [Fact]
     public async Task Custom_Tools_AreAvailable()
     {
-        var sut = new DefaultQueryToolkit(
+        var sut = new QueryToolkit(
             new CustomFormatter(), 
             new CustomParser(), 
             new CustomExpressionBuilder(), 
