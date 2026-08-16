@@ -44,7 +44,8 @@ public static class ServiceCollectionExtensions
                 new(typeof(IExpressionBuilder), expressionBuilderType, lifetime),
                 new(typeof(IQueryCriteriaFormatter), queryCriteriaFormatterType, lifetime),
                 new(typeof(IQueryCriteriaParser), queryCriteriaParserType, lifetime),
-                new(typeof(IQueryExecutor), queryExecutorType, lifetime)
+                new(typeof(IQueryExecutor), queryExecutorType, lifetime),
+                new(typeof(IQueryToolkit), typeof(DefaultQueryToolkit), lifetime)
             ];
         }
 

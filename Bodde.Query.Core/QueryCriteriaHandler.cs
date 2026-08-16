@@ -4,10 +4,8 @@ using Bodde.Query.Abstractions.Services;
 
 namespace Bodde.Query.Core;
 
-internal class QueryCriteriaHandler(IQueryToolkit queryToolkit) : IQueryCriteriaHandler
+internal class QueryCriteriaHandler(IExpressionBuilder expressionBuilder) : IQueryCriteriaHandler
 {
-    private readonly IExpressionBuilder expressionBuilder = queryToolkit.ExpressionBuilder;
-
     public IQueryable<T> ApplyCriteria<T>(IQueryable<T> originalQuery, QueryCriteria criteria)
     {
         var queryWithCriteria = criteria.Filter != null 

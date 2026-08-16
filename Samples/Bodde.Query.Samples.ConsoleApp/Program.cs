@@ -3,6 +3,7 @@ using Bodde.Query.Core;
 using Bodde.Query.Samples.Data;
 
 var queryToolkit = new DefaultQueryToolkit();
+
 var departments = DataSeeder.SeedDepartments();
 var employees = DataSeeder.SeedEmployees(departments);
 var employeesWithCriteria = employees
