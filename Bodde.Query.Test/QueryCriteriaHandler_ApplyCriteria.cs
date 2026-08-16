@@ -3,10 +3,8 @@ using Bodde.Query.Core;
 using Bodde.Query.Test.Helpers;
 using Bodde.Query.Test.Models;
 using Bodde.Query.Test.Extensions;
-using Moq;
 using COp = Bodde.Query.Abstractions.Models.FilterCriteria.ComparisonOperator;
 using LOp = Bodde.Query.Abstractions.Models.FilterCriteria.LogicalOperator;
-using Bodde.Query.Abstractions.Services;
 
 namespace Bodde.Query.Test;
 
@@ -18,7 +16,7 @@ public class QueryCriteriaHandler_ApplyCriteria
     public QueryCriteriaHandler_ApplyCriteria()
     {
         data = EmployeeSetBuilder.Build().AsQueryable();
-        sut = new QueryCriteriaHandler(new Mock<IQueryToolkit>().Object);
+        sut = new QueryCriteriaHandler(new ExpressionBuilder());
     }
 
     [Fact]
