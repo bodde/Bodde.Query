@@ -14,16 +14,14 @@ public class ODataParser_ParseOrderBy
     }
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("$orderby=")]
-    public void EmptyString_NullCriteria(string? input)
+    public void EmptyString_EmptyCriteria(string input)
     {
-#pragma warning disable CS8604 // Possible null reference argument.
         var result = sut.ParseOrderBy(input);
-#pragma warning restore CS8604 // Possible null reference argument.
 
-        Assert.Null(result);
+        Assert.NotNull(result);
+        Assert.Empty(result.Items);
     }
 
     [Fact]

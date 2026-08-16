@@ -29,15 +29,15 @@ internal class ODataFormatter : IQueryCriteriaFormatter
         ArgumentNullException.ThrowIfNull(paging);
 
         var parts = new List<string>();
-        
-        if (paging.Skip.HasValue) 
+
+        if (paging.Skip.HasValue)
             parts.Add($"$skip={paging.Skip.Value}");
 
         if (paging.Top.HasValue) 
             parts.Add($"$top={paging.Top.Value}");
 
-        if (paging.TotalCount.HasValue && paging.TotalCount.Value) 
-            parts.Add($"$count=true");
+        if (paging.TotalCount.HasValue) 
+            parts.Add($"$count={paging.TotalCount.Value.ToString().ToLowerInvariant()}");
 
         return string.Join("&", parts);
     }

@@ -1,8 +1,13 @@
+using Bodde.Query.Abstractions.Models;
+
 namespace Bodde.Query.Abstractions.Services;
 
 public interface IQueryExecutor
-{
-    Task<T[]> ToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default);
+{   
+    QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query);
 
-    Task<int> CountAsync<T>(IQueryable<T> query, CancellationToken ct = default);
+    Task<QueryCriteriaResult<T>> ToResultAsync<T>(
+        QueryableWithCriteria<T> query,
+        CancellationToken cancellationToken = default
+        );
 }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Bodde.Common.Extensions;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 
@@ -7,71 +8,9 @@ namespace Bodde.Query.Core;
 
 internal partial class ODataParser : IQueryCriteriaParser
 {
-    public PagingCriteria? ParsePaging(string pagingString)
+    public QueryCriteria Parse(string criteriaString)
     {
-        if (string.IsNullOrWhiteSpace(pagingString))
-            return null;
-
-        var skipValue = SkipRegex().Match(pagingString).Groups[1].Value;
-        var topValue = TopRegex().Match(pagingString).Groups[1].Value;
-        var countValue = CountRegex().Match(pagingString).Groups[1].Value;
-
-        if(string.IsNullOrEmpty(skipValue) && string.IsNullOrEmpty(topValue) && string.IsNullOrEmpty(countValue))
-            return null;
-
-        return new PagingCriteria(
-            Skip: string.IsNullOrEmpty(skipValue) ? null : int.Parse(skipValue),
-            Top: string.IsNullOrEmpty(topValue) ? null : int.Parse(topValue),
-            TotalCount: string.IsNullOrEmpty(countValue) ? null : bool.Parse(countValue)
-        );
-    }
-
-    public FilterCriteria? ParseFilter(string filterString)
-    {
-        if(filterString == null) 
-            return null;
-
-        filterString = filterString
-            .Replace("$filter=", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Trim();
-
-        if (string.IsNullOrEmpty(filterString))
-            return null;
-
-        var expressionsBag = new Dictionary<string, FilterCriteria.FilterExpression>();
-
-        filterString = ProcessComparisonExpressions(filterString, expressionsBag);
-        filterString = ProcessNotAndLogicalExpressions(filterString, expressionsBag);
-
-        var topLevelExpression = CreateTopLevelExpression(filterString, expressionsBag);
-
-        return new FilterCriteria(topLevelExpression);
-    }
-
-    public OrderByCriteria? ParseOrderBy(string orderByString)
-    {
-        if(orderByString == null) 
-            return null;
-
-        orderByString = orderByString
-            .Replace("$orderby=", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Trim();
-
-        if (string.IsNullOrEmpty(orderByString))
-            return null;
-
-        var orderByItems = orderByString
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(_ => ParseOrderByItem(_))
-            .ToArray();
-
-        return new OrderByCriteria(orderByItems);     
-    }
-
-    public QueryCriteria? Parse(string criteriaString)
-    {        
-        if(string.IsNullOrWhiteSpace(criteriaString)) 
-            return null;
+        ArgumentNullException.ThrowIfNull(criteriaString, nameof(criteriaString));
 
         var paging = ParsePaging(criteriaString);
 
@@ -83,13 +22,24 @@ internal partial class ODataParser : IQueryCriteriaParser
         var orderByCriteriaString = parts.FirstOrDefault(_ => _.StartsWith("$orderby=", StringComparison.OrdinalIgnoreCase));
         var orderBy = orderByCriteriaString != null ? ParseOrderBy(orderByCriteriaString) : null;
 
-        return new QueryCriteria(Filter: filter, Paging: paging, OrderBy: orderBy);
+        return new QueryCriteria(Filter: filter, OrderBy: orderBy, Paging: paging);
     }
 
-    public QueryCriteria? Parse(QueryCriteriaParameters? queryCriteriaParameters)
+    public QueryCriteria Parse(string? filter = null, string? orderBy = null, int? skip = null, int? top = null, bool? totalCount = null)
     {
-        if (queryCriteriaParameters == null || !queryCriteriaParameters.AreSet)
-            return null;
+        return Parse(new QueryCriteriaParameters
+        {
+            Filter = filter,
+            OrderBy = orderBy,
+            Skip = skip,
+            Top = top,
+            Count = totalCount
+        });
+    }
+
+    public QueryCriteria Parse(QueryCriteriaParameters queryCriteriaParameters)
+    {
+        ArgumentNullException.ThrowIfNull(queryCriteriaParameters, nameof(queryCriteriaParameters));
 
         var paging = new PagingCriteria(
             Skip: queryCriteriaParameters.Skip,
@@ -97,18 +47,95 @@ internal partial class ODataParser : IQueryCriteriaParser
             TotalCount: queryCriteriaParameters.Count
         );
 
-        var filter = !string.IsNullOrWhiteSpace(queryCriteriaParameters.Filter)
-            ? ParseFilter(queryCriteriaParameters.Filter!)
-            : null;
-
-        var orderBy = !string.IsNullOrWhiteSpace(queryCriteriaParameters.OrderBy)
-            ? ParseOrderBy(queryCriteriaParameters.OrderBy!)
-            : null;
+        var filter = queryCriteriaParameters.Filter != null ? ParseFilter(queryCriteriaParameters.Filter) : null;
+        var orderBy = queryCriteriaParameters.OrderBy != null ? ParseOrderBy(queryCriteriaParameters.OrderBy) : null;
 
         return new QueryCriteria(
             Paging: paging,
             Filter: filter,
             OrderBy: orderBy
+        );
+    }
+    
+
+    public PagingCriteria ParsePaging(string pagingString)
+    {
+        ArgumentNullException.ThrowIfNull(pagingString, nameof(pagingString));
+
+        var skipValue = SkipRegex().Match(pagingString).Groups[1].Value;
+        var topValue = TopRegex().Match(pagingString).Groups[1].Value;
+        var countValue = CountRegex().Match(pagingString).Groups[1].Value;
+
+        return new PagingCriteria(
+            Skip: string.IsNullOrEmpty(skipValue) ? null : int.Parse(skipValue),
+            Top: string.IsNullOrEmpty(topValue) ? null : int.Parse(topValue),
+            TotalCount: string.IsNullOrEmpty(countValue) ? null : bool.Parse(countValue)
+        );
+    }
+
+    public FilterCriteria.FilterExpression ParseFilterExpression(string filterString)
+    {
+        ArgumentNullException.ThrowIfNull(filterString, nameof(filterString));
+
+        filterString = filterString
+            .Replace("$filter=", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Trim();
+
+        var expressionsBag = new Dictionary<string, FilterCriteria.FilterExpression>();
+
+        filterString = ProcessComparisonExpressions(filterString, expressionsBag);
+        filterString = ProcessNotAndLogicalExpressions(filterString, expressionsBag);
+
+        return CreateTopLevelExpression(filterString, expressionsBag);
+    }
+
+    public FilterCriteria ParseFilter(string filterString)
+    {        
+        var topLevelExpression = ParseFilterExpression(filterString);      
+        return new FilterCriteria(topLevelExpression);
+    }
+
+    public OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString)
+    {
+        ArgumentNullException.ThrowIfNull(orderByString, nameof(orderByString));
+
+        var orderByItems = orderByString
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(_ => ParseOrderByItem(_))
+            .ToArray();
+
+        return orderByItems;
+    }
+
+    public OrderByCriteria ParseOrderBy(string orderByString)
+    {
+        ArgumentNullException.ThrowIfNull(orderByString, nameof(orderByString));
+
+        orderByString = orderByString
+            .Replace("$orderby=", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Trim();
+
+        var orderByItems = orderByString
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(_ => ParseOrderByItem(_))
+            .ToArray();
+
+        return new OrderByCriteria(orderByItems);     
+    }
+
+    private OrderByCriteria.OrderByItem ParseOrderByItem(string itemString)
+    {
+        ArgumentNullException.ThrowIfNull(itemString, nameof(itemString));
+
+        var parts = itemString.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var propertyPath = parts[0];
+        var direction = parts.Length > 1 && parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase)
+            ? OrderByCriteria.SortDirection.Descending
+            : OrderByCriteria.SortDirection.Ascending;
+
+        return new OrderByCriteria.OrderByItem(
+            PropertyPath: propertyPath,
+            Direction: direction
         );
     }
 
@@ -180,8 +207,8 @@ internal partial class ODataParser : IQueryCriteriaParser
     private static string[] GetInnerLogicalExpressions(string filterString)
     {
         return SurroundedByParenthesesRegex().Matches(filterString)
-                        .Select(m => m.Value)
-                        .ToArray();
+                .Select(m => m.Value)
+                .ToArray();
     }
 
     private string ProcessInnerLogicalExpressions(
@@ -403,35 +430,28 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private FilterCriteria.ComparisonOperator ConvertODataOperatorToComparisonOperator(string operatorString)
     {
-        return operatorString switch
+        if (_comparisonOperators.TryGetValue(operatorString, out var comparisonOperator))
         {
-            "eq" => FilterCriteria.ComparisonOperator.Equals,
-            "ne" => FilterCriteria.ComparisonOperator.NotEquals,
-            "gt" => FilterCriteria.ComparisonOperator.GreaterThan,
-            "ge" => FilterCriteria.ComparisonOperator.GreaterThanOrEqual,
-            "lt" => FilterCriteria.ComparisonOperator.LessThan,
-            "le" => FilterCriteria.ComparisonOperator.LessThanOrEqual,
-            "contains" => FilterCriteria.ComparisonOperator.Contains,
-            "startswith" => FilterCriteria.ComparisonOperator.StartsWith,
-            "endswith" => FilterCriteria.ComparisonOperator.EndsWith,
-            "in" => FilterCriteria.ComparisonOperator.In,
-            _ => throw new NotImplementedException($"OData operator '{operatorString}' is not supported.")
-        };
+            return comparisonOperator;
+        }
+
+        throw new InvalidOperationException($"OData operator '{operatorString}' is not supported. Supported operators are: {_comparisonOperators.Keys.ToCsv()}");
     }
 
-    private static OrderByCriteria.OrderByItem ParseOrderByItem(string itemString)
+    private static readonly Dictionary<string, FilterCriteria.ComparisonOperator> _comparisonOperators = new()
     {
-        var parts = itemString.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var propertyPath = parts[0];
-        var direction = parts.Length > 1 && parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase)
-            ? OrderByCriteria.SortDirection.Descending
-            : OrderByCriteria.SortDirection.Ascending;
-        return new OrderByCriteria.OrderByItem(
-            PropertyPath: propertyPath,
-            Direction: direction
-        );
-    }
-
+        {"eq", FilterCriteria.ComparisonOperator.Equals},
+        {"ne", FilterCriteria.ComparisonOperator.NotEquals},
+        {"gt", FilterCriteria.ComparisonOperator.GreaterThan},
+        {"ge", FilterCriteria.ComparisonOperator.GreaterThanOrEqual},
+        {"lt", FilterCriteria.ComparisonOperator.LessThan},
+        {"le", FilterCriteria.ComparisonOperator.LessThanOrEqual},
+        {"contains", FilterCriteria.ComparisonOperator.Contains},
+        {"startswith", FilterCriteria.ComparisonOperator.StartsWith},
+        {"endswith", FilterCriteria.ComparisonOperator.EndsWith},
+        {"in", FilterCriteria.ComparisonOperator.In}
+    };
+    
     [GeneratedRegex(@"([\w\.]+\s+(?:eq|ne|gt|ge|lt|le|contains|startswith|endswith|in)\s+(?:null|true|false|'[^']*'|\(.+\)|[\d\-T\:\.Z]+))", RegexOptions.IgnoreCase)]
     private static partial Regex ComparisonStatementsRegex();
 

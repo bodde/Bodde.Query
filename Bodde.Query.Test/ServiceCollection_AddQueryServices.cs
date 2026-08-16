@@ -137,12 +137,17 @@ public class ServiceCollection_AddQueryServices
 
     private class CustomQueryCriteriaHandler : IQueryCriteriaHandler
     {
-        public QueryCriteriaQueryable<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria)
+        public IQueryable<T> ApplyCriteria<T>(IQueryable<T> query, QueryCriteria criteria)
         {
             throw new NotImplementedException();
         }
 
-        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryCriteriaQueryable<T> query, CancellationToken cancellationToken = default)
+        public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -196,27 +201,42 @@ public class ServiceCollection_AddQueryServices
 
     private class CustomQueryCriteriaParser : IQueryCriteriaParser
     {
-        public QueryCriteria? Parse(string criteriaString)
+        public QueryCriteria Parse(string criteriaString)
         {
             throw new NotImplementedException();
         }
 
-        public QueryCriteria? Parse(QueryCriteriaParameters? queryCriteriaParameters)
+        public QueryCriteria Parse(QueryCriteriaParameters? queryCriteriaParameters)
         {
             throw new NotImplementedException();
         }
 
-        public FilterCriteria? ParseFilter(string filterString)
+        public QueryCriteria Parse(string? filter = null, string? orderBy = null, int? skip = null, int? top = null, bool? totalCount = null)
         {
             throw new NotImplementedException();
         }
 
-        public OrderByCriteria? ParseOrderBy(string orderByString)
+        public FilterCriteria ParseFilter(string filterString)
         {
             throw new NotImplementedException();
         }
 
-        public PagingCriteria? ParsePaging(string pagingString)
+        public FilterCriteria.FilterExpression ParseFilterExpression(string filterString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public OrderByCriteria ParseOrderBy(string orderByString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public PagingCriteria ParsePaging(string pagingString)
         {
             throw new NotImplementedException();
         }
@@ -230,6 +250,16 @@ public class ServiceCollection_AddQueryServices
         }
 
         public Task<T[]> ToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

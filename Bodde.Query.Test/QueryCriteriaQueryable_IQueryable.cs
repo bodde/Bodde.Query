@@ -1,5 +1,5 @@
-using System;
 using Bodde.Query.Abstractions.Models;
+using Bodde.Query.Core;
 
 namespace Bodde.Query.Test;
 
@@ -9,11 +9,11 @@ public class QueryCriteriaQueryable_IQueryable
     public void IQueryable_Implemented()
     {
         var queryCriteria = new QueryCriteria();
+        var queryToolkit = new DefaultQueryToolkit();
         var originalQuery = Array.Empty<int>().AsQueryable();
-        var queryWithCriteria = Array.Empty<int>().AsQueryable();
-        var sut = new QueryCriteriaQueryable<int>(originalQuery, queryCriteria, queryWithCriteria);
+        var sut = new QueryableWithCriteria<int>("Test", queryToolkit, originalQuery, queryCriteria);
 
-        var actualQueryCriteria = sut.QueryCriteria;
+        var actualQueryCriteria = sut.Criteria;
         var actualElementType = sut.ElementType;
         var actualExpression = sut.Expression;
         var actualProvider = sut.Provider;
@@ -21,9 +21,9 @@ public class QueryCriteriaQueryable_IQueryable
         var actualEnumeratorNonGeneric = ((System.Collections.IEnumerable)sut).GetEnumerator();
 
         Assert.Equal(queryCriteria, actualQueryCriteria);
-        Assert.Equal(queryWithCriteria.ElementType, actualElementType);
-        Assert.Equal(queryWithCriteria.Expression, actualExpression);
-        Assert.Equal(queryWithCriteria.Provider, actualProvider);
+        Assert.Equal(originalQuery.ElementType, actualElementType);
+        Assert.Equal(originalQuery.Expression, actualExpression);
+        Assert.Equal(originalQuery.Provider, actualProvider);
         Assert.NotNull(actualEnumerator);
         Assert.NotNull(actualEnumeratorNonGeneric);
     }

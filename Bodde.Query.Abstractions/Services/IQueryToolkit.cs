@@ -1,14 +1,16 @@
 namespace Bodde.Query.Abstractions.Services;
 
-public interface IQueryCriteriaToolkit
+public interface IQueryToolkit
 {
     IQueryCriteriaFormatter Formatter { get; }
 
-    IQueryCriteriaParser Parser { get; }
+    IQueryCriteriaParser Parser { get; }    
+    
+    IExpressionBuilder ExpressionBuilder { get; }
 
     IQueryCriteriaHandler Handler { get; }
 
     IQueryExecutor Executor { get; }
 
-    IExpressionBuilder ExpressionBuilder { get; }
+
 }

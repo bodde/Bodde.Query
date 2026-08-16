@@ -15,15 +15,16 @@ public class ODataParser_ParsePaging
     }
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
-    public void Empty_NullCriteria(string? input)
+    [InlineData(" ")]
+    public void Empty_DefaultCriteria(string input)
     {
-#pragma warning disable CS8604 // Possible null reference argument.
         var result = sut.ParsePaging(input);
-#pragma warning restore CS8604 // Possible null reference argument.
 
-        Assert.Null(result);
+        Assert.NotNull(result);
+        Assert.Null(result.Skip);
+        Assert.Null(result.Top);
+        Assert.Null(result.TotalCount);
     }
 
     [Theory]
