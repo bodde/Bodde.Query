@@ -1,14 +1,12 @@
-using Bodde.Query.Abstractions.Services;
+namespace Bodde.Query.Core;
 
-internal class DefaultQueryExecutor : IQueryExecutor
-    {
-        public Task<int> CountAsync<T>(IQueryable<T> query, CancellationToken ct = default)
-        {
-            return Task.FromResult(query.Count());
-        }
+internal class DefaultQueryExecutor : QueryExecutor
+{
+    protected override int Count<T>(IQueryable<T> query) => query.Count();
 
-        public Task<T[]> ToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default)
-        {
-            return Task.FromResult(query.ToArray());
-        }
-    }
+    protected override Task<int> CountAsync<T>(IQueryable<T> query, CancellationToken ct = default) => Task.FromResult(Count(query));
+
+    protected override T[] ToArray<T>(IQueryable<T> query) => query.ToArray();
+
+    protected override Task<T[]> ToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default) => Task.FromResult(ToArray(query));
+}

@@ -1,113 +1,92 @@
-﻿using Bodde.Common.Extensions;
-using Bodde.Query.Abstractions.Models;
+﻿using Bodde.Query.Abstractions.Models;
+using Bodde.Query.Core;
 using Bodde.Query.Samples.Data;
-using static Bodde.Query.Abstractions.Models.FilterCriteria;
 
+var queryToolkit = new DefaultQueryToolkit();
 var departments = DataSeeder.SeedDepartments();
-var data = DataSeeder.SeedEmployees(departments).AsQueryable();
-var filteredData = data;
+var employees = DataSeeder.SeedEmployees(departments);
+var employeesWithCriteria = employees
+    .AsQueryable()
+    .WithCriteria(name: "Employees", queryToolkit);
 
-var queryToolkit = new QueryToolkit();
+var page1 = employeesWithCriteria
+    .WithPaging(skip: 0, top: 10)
+    .WithName("Employees - Page 1");
 
-var commands = new (string name, Func<QueryCriteria, QueryCriteria> updateCriteria)[]
+ShowResult(page1.ToResult());
+
+var page2 = employeesWithCriteria
+    .WithPaging(skip: 10, top: 10)
+    .WithName("Employees - Page 2");
+
+ShowResult(page2.ToResult());
+
+var page3 = employeesWithCriteria
+    .WithPaging(skip: 20, top: 10)
+    .WithName("Employees - Page 3");
+
+ShowResult(page3.ToResult());
+
+var page4 = employeesWithCriteria
+    .WithPaging(skip: 30, top: 10)
+    .WithName("Employees - Page 4");
+
+ShowResult(page4.ToResult());
+
+var employeesNamedJohn = employeesWithCriteria
+    .WithFilter("Name startswith 'John'")
+    .WithName("Employees named John");
+ShowResult(employeesNamedJohn.ToResult());
+
+var employeesByHireDateDesc = employeesWithCriteria
+    .WithOrderBy("HireDate desc")
+    .WithName("Employees by hire date (descending)");
+ShowResult(employeesByHireDateDesc.ToResult());
+
+var employeesFromHR = employeesWithCriteria
+    .WithFilter("Department.Name eq 'Human Resources'")
+    .WithName("Employees from HR");
+ShowResult(employeesFromHR.ToResult());
+
+var employeesFromHRByHireDateDesc = employeesFromHR
+    .WithOrderBy("HireDate desc")
+    .WithName("Employees from HR by hire date (descending)");
+ShowResult(employeesFromHRByHireDateDesc.ToResult());
+
+var employeesFromHRByHireDateDescPage2 = employeesFromHRByHireDateDesc
+    .WithPaging(skip: 10, top: 10)
+    .WithName("Employees from HR by hire date (descending) - Page 2");
+ShowResult(employeesFromHRByHireDateDescPage2.ToResult());
+
+var multipleCriteria = employeesWithCriteria
+    .WithFilter("Department.Name in ('Human Resources', 'Engineering') or Salary gt 30000")
+    .WithFilter("HireDate ge 2021-01-01 and IsActive eq true")   // filters can be combined using multiple WithFilter calls
+    .WithOrderBy("Department.Name desc, HireDate")
+    .WithPaging(skip: 0, top: 10)
+    .WithName("Multiple criteria");
+
+ShowResult(multipleCriteria.ToResult());
+
+
+void ShowResult(QueryCriteriaResult<Employee> result)
 {
-    ( "Reset", ResetCriteriaCommand),
-    ( "Add filter", AddFilterCommand ),
-    ( "Add order by", AddOrderByCommand )
-};
+    Console.WriteLine($"{result.Name}:");
+    Console.WriteLine(result.Items.ToDisplayTable(
+        new(_ => _.Id), 
+        new(_ => _.Name), 
+        new(_ => _.Department!.Name, header: "Department"), 
+        new(_ => _.Salary, valueFormatter: value => $"{value:C}"), 
+        new(_ => _.HireDate, header: "Hire Date", valueFormatter: value => $"{value:yyyy-MM-dd}"),
+        new(_ => _.IsActive, header: "Is Active")
+        ));
 
-var queryCriteria = new QueryCriteria();
-
-while (true)
-{
-    var displayTable = filteredData.ToDisplayTable(d => d.Id, d => d.Name, d => d.Department!.Name, d => d.Salary, d => d.HireDate, d => d.IsActive);   
-    Console.WriteLine(displayTable);
-
-    var queryCriteriaString = queryToolkit.Formatter.Format(queryCriteria);
-    queryCriteriaString = queryCriteriaString.IsEmpty() ? "(none)" : queryCriteriaString;
-    Console.WriteLine($"Current query criteria: {queryCriteriaString}");
-
-    Console.WriteLine("Select command (or press Enter to exit)");
-    for (int i = 0; i < commands.Length; i++)
+    if(result.TotalCount.HasValue)
     {
-        var command = commands[i];
-        Console.WriteLine($"{i}. {command.name}");
+        Console.WriteLine($"Total Count: {result.TotalCount.Value}");
     }
 
-    var input = Console.ReadLine() ?? string.Empty;
-    if (input.IsEmpty())
-        break;
+    var formattedQuery = queryToolkit.Formatter.Format(result.Criteria);
+    Console.WriteLine($"Formatted Query: {formattedQuery}");
 
-    if (int.TryParse(input, out int commandIndex) && commandIndex >= 0 && commandIndex < commands.Length)
-    {
-        var command = commands[commandIndex];
-        Console.WriteLine($"{command.name}: ");
-        try
-        {
-            var newQueryCriteria = command.updateCriteria(queryCriteria);
-            filteredData = queryToolkit.Handler.ApplyCriteria(data, newQueryCriteria);
-
-            queryCriteria = newQueryCriteria;
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(ex.Message);
-            Console.ResetColor();
-        }
-    }
-}
-
-QueryCriteria ResetCriteriaCommand(QueryCriteria criteria) => new();
-
-QueryCriteria AddFilterCommand(QueryCriteria queryCriteria)
-{
-    var input = Console.ReadLine() ?? string.Empty;
-    if(input.IsEmpty())
-        return queryCriteria;
-
-    var filterExpression = queryToolkit.Parser.ParseFilterExpression(input);
-    if(filterExpression is null)
-        return queryCriteria;
-    
-    if(queryCriteria.Filter is null)
-    {
-        return new QueryCriteria(
-            Filter: new FilterCriteria(filterExpression), 
-            OrderBy: queryCriteria.OrderBy, 
-            Paging: queryCriteria.Paging
-            );
-    }
-
-    var combinedExpression = new LogicalExpression(
-        LogicalOperator.And, 
-        queryCriteria.Filter.Expression, 
-        filterExpression
-    );
-
-    return new QueryCriteria(
-        Filter: new FilterCriteria(combinedExpression),
-        OrderBy: queryCriteria.OrderBy,
-        Paging: queryCriteria.Paging
-    );       
-}
-
-QueryCriteria AddOrderByCommand(QueryCriteria queryCriteria)
-{           
-    var input = Console.ReadLine() ?? string.Empty;
-    if(input.IsEmpty())
-        return queryCriteria;
-
-    var orderByItems = queryToolkit.Parser.ParseOrderByItems(input);
-    if(orderByItems is null || orderByItems.Length == 0)
-        return queryCriteria;
-
-    var criteriaOrderByItems = queryCriteria.OrderBy?.Items ?? [];
-    var combinedOrderByItems = criteriaOrderByItems.Concat(orderByItems).ToArray();
-
-    return new QueryCriteria(
-        Filter: queryCriteria.Filter,
-        OrderBy: new OrderByCriteria(combinedOrderByItems),
-        Paging: queryCriteria.Paging
-    );    
+    Console.WriteLine();
 }
