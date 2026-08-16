@@ -1,3 +1,5 @@
+# Dependency Injection Console Sample
+
 # EF Core Console Sample
 
 # Minimal Api Sample

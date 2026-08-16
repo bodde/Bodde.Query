@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/Samples/">
-    <Project Path="Samples/Bodde.Query.Sample.ConsoleApp/Bodde.Query.Sample.ConsoleApp.csproj" />    
+    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp/Bodde.Query.Samples.ConsoleApp.csproj" />    
     <Project Path="Samples/Bodde.Query.Samples.Data/Bodde.Query.Samples.Data.csproj" />
   </Folder>
   <Project Path="Bodde.Query.Abstractions/Bodde.Query.Abstractions.csproj" />
