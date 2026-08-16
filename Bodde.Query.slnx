@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Samples/">
     <Project Path="Samples/Bodde.Query.Samples.ConsoleApp.DependencyInjection/Bodde.Query.Samples.ConsoleApp.DependencyInjection.csproj" />
+    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp.EFCore/Bodde.Query.Samples.ConsoleApp.EFCore.csproj" />
     <Project Path="Samples/Bodde.Query.Samples.ConsoleApp/Bodde.Query.Samples.ConsoleApp.csproj" />    
     <Project Path="Samples/Bodde.Query.Samples.Data/Bodde.Query.Samples.Data.csproj" />
   </Folder>

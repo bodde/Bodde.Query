@@ -14,7 +14,7 @@ public static class QueryableWithCriteriaExtensions
             return new(
                 name,
                 query.Toolkit,
-                query.Queryable,
+                query.InputQuery,
                 query.Criteria
             );
         }
@@ -40,7 +40,7 @@ public static class QueryableWithCriteriaExtensions
             return new QueryableWithCriteria<T>(
                 query.Name,
                 query.Toolkit,
-                query.Queryable,
+                query.InputQuery,
                 newCriteria
             );
         }
@@ -60,7 +60,7 @@ public static class QueryableWithCriteriaExtensions
             return new QueryableWithCriteria<T>(
                 query.Name,
                 query.Toolkit,
-                query.Queryable,
+                query.InputQuery,
                 newCriteria
             );
         }
@@ -76,7 +76,7 @@ public static class QueryableWithCriteriaExtensions
             return new QueryableWithCriteria<T>(
                 query.Name,
                 query.Toolkit,
-                query.Queryable,
+                query.InputQuery,
                 newCriteria
             );
         }
@@ -89,7 +89,7 @@ public static class QueryableWithCriteriaExtensions
             var criteriaForCount = new QueryCriteria(Filter: criteria.Filter);
             var queryForCountName = $"{name} Count";
 
-            return  queryable.WithCriteria(queryForCountName, criteriaForCount, toolkit);
+            return queryable.WithCriteria(queryForCountName, criteriaForCount, toolkit);
         }
 
         public QueryCriteriaResult<T> ToResult()

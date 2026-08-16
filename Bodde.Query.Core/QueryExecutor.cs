@@ -15,16 +15,16 @@ public abstract class QueryExecutor : IQueryExecutor
 
     public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
     {       
-        var result = ToArray(query);
-        int? totalCount = query.RequiresTotalCount() ? Count(query.ForTotalCount()) : null;
+        var result = ToArray(query.OutputQuery);
+        int? totalCount = query.RequiresTotalCount() ? Count(query.ForTotalCount().OutputQuery) : null;
 
         return new QueryCriteriaResult<T>(query.Name, query.Criteria, result, totalCount);
     }
 
     public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
     {        
-        var result = await ToArrayAsync(query, cancellationToken);
-        int? totalCount = query.RequiresTotalCount() ? await CountAsync(query.ForTotalCount(), cancellationToken) : null;
+        var result = await ToArrayAsync(query.OutputQuery, cancellationToken);
+        int? totalCount = query.RequiresTotalCount() ? await CountAsync(query.ForTotalCount().OutputQuery, cancellationToken) : null;
 
         return new QueryCriteriaResult<T>(query.Name, query.Criteria, result, totalCount);
     }
