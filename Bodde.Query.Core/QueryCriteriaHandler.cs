@@ -4,11 +4,10 @@ using Bodde.Query.Abstractions.Services;
 
 namespace Bodde.Query.Core;
 
-internal class QueryCriteriaHandler(
-    IExpressionBuilder expressionBuilder, 
-    IQueryToolkit queryToolkit
-    ) : IQueryCriteriaHandler
+internal class QueryCriteriaHandler(IQueryToolkit queryToolkit) : IQueryCriteriaHandler
 {
+    private readonly IExpressionBuilder expressionBuilder = queryToolkit.ExpressionBuilder;
+
     public IQueryable<T> ApplyCriteria<T>(IQueryable<T> originalQuery, QueryCriteria criteria)
     {
         var queryWithCriteria = criteria.Filter != null 
@@ -24,50 +23,6 @@ internal class QueryCriteriaHandler(
             : queryWithCriteria;
 
         return queryWithCriteria;
-    }
-
-    public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> queryableWithCriteria)
-    {
-        var name = queryableWithCriteria.Name;
-        var criteria = queryableWithCriteria.Criteria;
-        var result = queryableWithCriteria.ToArray();
-        var requiresTotalCount = criteria.Paging?.TotalCount == true;
-        if(!requiresTotalCount)
-        {
-            return new QueryCriteriaResult<T>(name, criteria, result, null);
-        }
-
-        var queryForCount = queryableWithCriteria.Criteria.Filter != null 
-            ? ApplyFilterCriteria(queryableWithCriteria.Queryable, queryableWithCriteria.Criteria.Filter) 
-            : queryableWithCriteria.Queryable;
-
-        var totalCount = queryForCount.Count();
-
-        return new QueryCriteriaResult<T>(name, criteria, result, totalCount);
-    }
-
-
-    public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(
-        QueryableWithCriteria<T> queryableWithCriteria,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var name = queryableWithCriteria.ToString();
-        var criteria = queryableWithCriteria.Criteria;
-        var result = await queryToolkit.Executor.ToArrayAsync(queryableWithCriteria, cancellationToken);
-        var requiresTotalCount = criteria.Paging?.TotalCount == true;
-        if(!requiresTotalCount)
-        {
-            return new QueryCriteriaResult<T>(name, criteria, result, null);
-        }
-
-        var queryForCount = criteria.Filter != null 
-            ? ApplyFilterCriteria(queryableWithCriteria.Queryable, criteria.Filter) 
-            : queryableWithCriteria.Queryable;
-
-        var totalCount = await queryToolkit.Executor.CountAsync(queryForCount, cancellationToken);
-
-        return new QueryCriteriaResult<T>(name, criteria, result, totalCount);
     }
 
     private IQueryable<T> ApplyFilterCriteria<T>(IQueryable<T> query, FilterCriteria filter)

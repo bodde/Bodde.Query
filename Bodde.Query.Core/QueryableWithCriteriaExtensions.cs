@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Bodde.Query.Abstractions.Models;
 
 namespace Bodde.Query.Core;
@@ -80,7 +81,18 @@ public static class QueryableWithCriteriaExtensions
             );
         }
 
+        public bool RequiresTotalCount() => query.Criteria.Paging?.TotalCount == true;
+
+        public QueryableWithCriteria<T> ForTotalCount()
+        {
+            var (name, toolkit, queryable, criteria) = query;
+            var criteriaForCount = new QueryCriteria(Filter: criteria.Filter);
+            var queryForCountName = $"{name} Count";
+
+            return  queryable.WithCriteria(queryForCountName, criteriaForCount, toolkit);
+        }
+
         public QueryCriteriaResult<T> ToResult()
-            => query.Toolkit.Handler.ToResult(query);
+            => query.Toolkit.Executor.ToResult(query);
     }
 }

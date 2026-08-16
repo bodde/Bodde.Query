@@ -253,5 +253,15 @@ public class ServiceCollection_AddQueryServices
         {
             throw new NotImplementedException();
         }
+
+        public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

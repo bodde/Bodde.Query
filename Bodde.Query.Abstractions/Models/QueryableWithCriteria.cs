@@ -33,4 +33,12 @@ public record QueryableWithCriteria<TItem>(
         return $"{name} ({criteria})";
     }
 
+    // public void Deconstruct(out string name, out IQueryable<TItem> queryable, out QueryCriteria criteria, out IQueryToolkit toolkit)
+    // {
+    //     name = Name;
+    //     queryable = Queryable;
+    //     criteria = Criteria;
+    //     toolkit = Toolkit;
+    // }
+
 }

@@ -38,8 +38,8 @@ public class DefaultQueryToolkit_ctor
     public async Task Custom_Tools_AreAvailable()
     {
         var sut = new DefaultQueryToolkit(
-            new CustomParser(), 
             new CustomFormatter(), 
+            new CustomParser(), 
             new CustomExpressionBuilder(), 
             new CustomHandler(), 
             new CustomExecutor()
@@ -177,6 +177,16 @@ public class DefaultQueryToolkit_ctor
         }
 
         public Task<T[]> ToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
