@@ -94,5 +94,9 @@ public static class QueryableWithCriteriaExtensions
 
         public QueryCriteriaResult<T> ToResult()
             => query.Toolkit.Executor.ToResult(query);
+
+
+        public Task<QueryCriteriaResult<T>> ToResultAsync()
+            => query.Toolkit.Executor.ToResultAsync(query);
     }
 }

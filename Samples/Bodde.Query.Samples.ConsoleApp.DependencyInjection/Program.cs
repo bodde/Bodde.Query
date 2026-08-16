@@ -19,7 +19,7 @@ host.Run();
 
 class QueryTesterService(IQueryToolkit queryToolkit, IHostApplicationLifetime hostApplicationLifetime) : BackgroundService
 {
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var departments = DataSeeder.SeedDepartments();
         var employees = DataSeeder.SeedEmployees(departments);
@@ -31,50 +31,50 @@ class QueryTesterService(IQueryToolkit queryToolkit, IHostApplicationLifetime ho
             .WithPaging(skip: 0, top: 10)
             .WithName("Employees - Page 1");
 
-        ShowResult(page1.ToResult());
+        ShowResult(await page1.ToResultAsync());
 
         var page2 = employeesWithCriteria
             .WithPaging(skip: 10, top: 10)
             .WithName("Employees - Page 2");
 
-        ShowResult(page2.ToResult());
+        ShowResult(await page2.ToResultAsync());
 
         var page3 = employeesWithCriteria
             .WithPaging(skip: 20, top: 10)
             .WithName("Employees - Page 3");
 
-        ShowResult(page3.ToResult());
+        ShowResult(await page3.ToResultAsync());
 
         var page4 = employeesWithCriteria
             .WithPaging(skip: 30, top: 10)
             .WithName("Employees - Page 4");
 
-        ShowResult(page4.ToResult());
+        ShowResult(await page4.ToResultAsync());
 
         var employeesNamedJohn = employeesWithCriteria
             .WithFilter("Name startswith 'John'")
             .WithName("Employees named John");
-        ShowResult(employeesNamedJohn.ToResult());
+        ShowResult(await employeesNamedJohn.ToResultAsync());
 
         var employeesByHireDateDesc = employeesWithCriteria
             .WithOrderBy("HireDate desc")
             .WithName("Employees by hire date (descending)");
-        ShowResult(employeesByHireDateDesc.ToResult());
+        ShowResult(await employeesByHireDateDesc.ToResultAsync());
 
         var employeesFromHR = employeesWithCriteria
             .WithFilter("Department.Name eq 'Human Resources'")
             .WithName("Employees from HR");
-        ShowResult(employeesFromHR.ToResult());
+        ShowResult(await employeesFromHR.ToResultAsync());
 
         var employeesFromHRByHireDateDesc = employeesFromHR
             .WithOrderBy("HireDate desc")
             .WithName("Employees from HR by hire date (descending)");
-        ShowResult(employeesFromHRByHireDateDesc.ToResult());
+        ShowResult(await employeesFromHRByHireDateDesc.ToResultAsync());
 
         var employeesFromHRByHireDateDescPage2 = employeesFromHRByHireDateDesc
             .WithPaging(skip: 10, top: 10)
             .WithName("Employees from HR by hire date (descending) - Page 2");
-        ShowResult(employeesFromHRByHireDateDescPage2.ToResult());
+        ShowResult(await employeesFromHRByHireDateDescPage2.ToResultAsync());
 
         var multipleCriteria = employeesWithCriteria
             .WithFilter("Department.Name in ('Human Resources', 'Engineering') or Salary gt 30000")
@@ -83,10 +83,9 @@ class QueryTesterService(IQueryToolkit queryToolkit, IHostApplicationLifetime ho
             .WithPaging(skip: 0, top: 10)
             .WithName("Multiple criteria");
 
-        ShowResult(multipleCriteria.ToResult());
+        ShowResult(await multipleCriteria.ToResultAsync());
 
         hostApplicationLifetime.StopApplication();
-        return Task.CompletedTask;
     }
 
     private void ShowResult(QueryCriteriaResult<Employee> result)
