@@ -12,8 +12,4 @@
     <ProjectReference Include="../Bodde.Query.Samples.Data/Bodde.Query.Samples.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-      <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
-  </ItemGroup>
-
 </Project>
