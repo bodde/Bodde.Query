@@ -22,7 +22,7 @@ public class QueryableExtensions_WithCriteria
         Assert.Equal(queryToolkit, sut.Toolkit);
         Assert.Empty(sut.Name);
         Assert.Equal(emptyCriteria, sut.Criteria);
-        Assert.Equal(employees, sut.Queryable);
+        Assert.Equal(employees, sut.InputQuery);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class QueryableExtensions_WithCriteria
         Assert.Equal(queryToolkit, sut.Toolkit);
         Assert.Equal(customName, sut.Name);
         Assert.Equal(emptyCriteria, sut.Criteria);
-        Assert.Equal(employees, sut.Queryable);
+        Assert.Equal(employees, sut.InputQuery);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class QueryableExtensions_WithCriteria
         Assert.Equal(queryToolkit, sut.Toolkit);
         Assert.Empty(sut.Name);
         Assert.Equal(customCriteria, sut.Criteria);
-        Assert.Equal(employees, sut.Queryable);
+        Assert.Equal(employees, sut.InputQuery);
     }
 
     [Fact]
@@ -80,6 +80,6 @@ public class QueryableExtensions_WithCriteria
         Assert.Equal(queryToolkit, sut.Toolkit);
         Assert.Equal(customName, sut.Name);
         Assert.Equal(customCriteria, sut.Criteria);
-        Assert.Equal(employees, sut.Queryable);
+        Assert.Equal(employees, sut.InputQuery);
     }
 }
