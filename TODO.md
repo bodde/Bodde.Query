@@ -2,6 +2,9 @@
 
 # Minimal Api Sample
 
+# Refactorings
+- [ ] rename DefaultQueryTookit to QueryTookit with Default(...) static factory method
+
 # Optimizations
 - [ ] Add ConfigureAwait(false) to every Bodde.Query.core awaited call
 
