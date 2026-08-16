@@ -5,7 +5,8 @@ using Bodde.Query.Samples.Data;
 using Microsoft.EntityFrameworkCore;
 
 using var ctx = new CompanyDbContext();
-await InitializeDbContextAsync(ctx);
+
+await InitializeDatabaseAsync(ctx);
 
 var queryToolkit = QueryToolkit.Default(executor: new EntityFrameworkCoreQueryExecutor());
 
@@ -94,20 +95,11 @@ void ShowResult(QueryCriteriaResult<Employee> result)
     Console.WriteLine();
 }
 
-static async Task InitializeDbContextAsync(CompanyDbContext ctx)
+static async Task InitializeDatabaseAsync(CompanyDbContext ctx)
 {
     Console.WriteLine($"Initializing {CompanyDbContext.DbPath}");
-
     await ctx.Database.EnsureDeletedAsync();
     await ctx.Database.EnsureCreatedAsync();
-
-    var departments = DataSeeder.SeedDepartments();
-    await ctx.Departments.AddRangeAsync(departments);
-
-    var employees = DataSeeder.SeedEmployees(departments);
-    await ctx.Employees.AddRangeAsync(employees);
-
-    await ctx.SaveChangesAsync();
 }
 
 internal class CompanyDbContext : DbContext
@@ -120,5 +112,18 @@ internal class CompanyDbContext : DbContext
     // The following configures EF to create a Sqlite database file in the
     // special "local" folder for your platform.
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
+        => options
+            .UseSqlite($"Data Source={DbPath}")
+            .UseAsyncSeeding(SeedDataAsync);
+
+    private async Task SeedDataAsync(DbContext ctx, bool _, CancellationToken ct)
+    {
+        var departments = DataSeeder.SeedDepartments();
+        await ctx.Set<Department>().AddRangeAsync(departments, ct);
+
+        var employees = DataSeeder.SeedEmployees(departments);
+        await ctx.Set<Employee>().AddRangeAsync(employees, ct);
+
+        await ctx.SaveChangesAsync(ct);
+    }
 }
