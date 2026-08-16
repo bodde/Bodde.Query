@@ -6,6 +6,6 @@ public static class QueryServicesBuilderExtensions
 {
     public static IQueryServicesBuilder WithEntityFrameworkCore(this IQueryServicesBuilder builder)
     {
-        return builder.WithQueryExecutor<QueryExecutor>();
+        return builder.WithQueryExecutor<EntityFrameworkCoreQueryExecutor>();
     }
 }
