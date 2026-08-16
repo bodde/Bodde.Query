@@ -8,7 +8,11 @@
 - [ ] Add ConfigureAwait(false) to every Bodde.Query.core awaited call
 
 # Tests
-- [ ] Refactor with 
+- [ ] Refactor everywhere with Moq dependencies
+
+# Clean code
+- [ ] Remove all unnecessary usings
+
 
 # Code Coverage
 

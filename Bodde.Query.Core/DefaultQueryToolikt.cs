@@ -15,7 +15,7 @@ public class DefaultQueryToolkit : IQueryToolkit
         Formatter = formatter ?? new ODataFormatter();
         Parser = parser ?? new ODataParser();
         ExpressionBuilder = expressionBuilder ?? new ExpressionBuilder();
-        Handler = handler ?? new QueryCriteriaHandler(this);
+        Handler = handler ?? new QueryCriteriaHandler(ExpressionBuilder);
         Executor = executor ?? new DefaultQueryExecutor();
     }
 
