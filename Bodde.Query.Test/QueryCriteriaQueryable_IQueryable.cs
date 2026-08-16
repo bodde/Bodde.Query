@@ -9,7 +9,7 @@ public class QueryCriteriaQueryable_IQueryable
     public void IQueryable_Implemented()
     {
         var queryCriteria = new QueryCriteria();
-        var queryToolkit = new DefaultQueryToolkit();
+        var queryToolkit = QueryToolkit.Default();
         var originalQuery = Array.Empty<int>().AsQueryable();
         var sut = new QueryableWithCriteria<int>("Test", queryToolkit, originalQuery, queryCriteria);
 

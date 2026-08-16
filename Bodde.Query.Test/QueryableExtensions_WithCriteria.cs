@@ -12,7 +12,7 @@ public class QueryableExtensions_WithCriteria
     {
         var employees = EmployeeSetBuilder.Build().AsQueryable();
 
-        var queryToolkit = new DefaultQueryToolkit();
+        var queryToolkit = QueryToolkit.Default();
         var emptyCriteria = new QueryCriteria();
 
         var sut = employees.WithCriteria(queryToolkit);
@@ -30,7 +30,7 @@ public class QueryableExtensions_WithCriteria
     {
         var employees = EmployeeSetBuilder.Build().AsQueryable();
 
-        var queryToolkit = new DefaultQueryToolkit();
+        var queryToolkit = QueryToolkit.Default();
         var emptyCriteria = new QueryCriteria();
         var customName = "CustomQueryName";
 
@@ -50,7 +50,7 @@ public class QueryableExtensions_WithCriteria
         var employees = EmployeeSetBuilder.Build().AsQueryable();
         var salaryGreaterThan8000 = new FilterCriteria.ComparisonExpression("Salary", FilterCriteria.ComparisonOperator.GreaterThan, 80000);
 
-        var queryToolkit = new DefaultQueryToolkit();
+        var queryToolkit = QueryToolkit.Default();
         var customCriteria = new QueryCriteria(new(salaryGreaterThan8000));
 
         var sut = employees.WithCriteria(customCriteria, queryToolkit);
@@ -69,7 +69,7 @@ public class QueryableExtensions_WithCriteria
         var employees = EmployeeSetBuilder.Build().AsQueryable();
         var salaryGreaterThan8000 = new FilterCriteria.ComparisonExpression("Salary", FilterCriteria.ComparisonOperator.GreaterThan, 80000);
 
-        var queryToolkit = new DefaultQueryToolkit();
+        var queryToolkit = QueryToolkit.Default();
         var customCriteria = new QueryCriteria(new(salaryGreaterThan8000));
         var customName = "CustomQueryName";
 

@@ -10,7 +10,7 @@ public class QueryableWithCriteria_ToString
     [Fact]
     public void ToString_ReturnsExpectedString()
     {
-        var toolkit = new DefaultQueryToolkit();
+        var toolkit = QueryToolkit.Default();
 
         var employees = EmployeeSetBuilder.Build().AsQueryable();
         var queryName = "EmployeeQuery";
