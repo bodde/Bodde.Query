@@ -1,6 +1,5 @@
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Core;
-using Xunit;
 
 namespace Bodde.Query.Test;
 

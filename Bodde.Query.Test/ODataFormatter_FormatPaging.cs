@@ -1,4 +1,3 @@
-using System;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Core;
 

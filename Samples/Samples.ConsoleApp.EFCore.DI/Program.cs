@@ -1,5 +1,4 @@
-﻿using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Core;
+﻿using Bodde.Query.Core;
 using Bodde.Query.EntityFrameworkCore;
 using Samples.Common;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Bodde.Query.Abstractions.Services;
-using Bodde.Query.Abstractions.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
 
