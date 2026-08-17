@@ -1,30 +1,33 @@
 ﻿using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Core;
+using Bodde.Query.EntityFrameworkCore;
 using Samples.Data;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.Extensions.DependencyInjection;
+using Bodde.Query.Abstractions.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Logging.ClearProviders();
 
-builder.Services.AddQueryServices();
+builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
 builder.Services.AddHostedService<QueryTesterService>();
 
 var host = builder.Build();
 host.Run();
 
+
 class QueryTesterService(IQueryToolkit queryToolkit, IHostApplicationLifetime hostApplicationLifetime) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var departments = DataSeeder.SeedDepartments();
-        var employees = DataSeeder.SeedEmployees(departments);
-        var employeesWithCriteria = employees
-            .AsQueryable()
+        using var ctx = new CompanyDbContext();
+
+        await InitializeDatabaseAsync(ctx);
+
+        var employeesWithCriteria = ctx.Employees
             .WithCriteria(name: "Employees", queryToolkit);
 
         var page1 = employeesWithCriteria
@@ -88,7 +91,7 @@ class QueryTesterService(IQueryToolkit queryToolkit, IHostApplicationLifetime ho
         hostApplicationLifetime.StopApplication();
     }
 
-    private void ShowResult(QueryCriteriaResult<Employee> result)
+    void ShowResult(QueryCriteriaResult<Employee> result)
     {
         Console.WriteLine($"{result.Name}:");
         Console.WriteLine(result.Items.ToDisplayTable(
@@ -110,5 +113,37 @@ class QueryTesterService(IQueryToolkit queryToolkit, IHostApplicationLifetime ho
 
         Console.WriteLine();
     }
+
+    static async Task InitializeDatabaseAsync(CompanyDbContext ctx)
+    {
+        Console.WriteLine($"Initializing {CompanyDbContext.DbPath}");
+        await ctx.Database.EnsureDeletedAsync();
+        await ctx.Database.EnsureCreatedAsync();
+    }
 }
 
+internal class CompanyDbContext : DbContext
+{
+    public static string DbPath => Path.Combine(Path.GetTempPath(), "companies.db");
+
+    public DbSet<Department> Departments { get; set; }
+    public DbSet<Employee> Employees { get; set; }
+
+    // The following configures EF to create a Sqlite database file in the
+    // special "local" folder for your platform.
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+        => options
+            .UseSqlite($"Data Source={DbPath}")
+            .UseAsyncSeeding(SeedDataAsync);
+
+    private async Task SeedDataAsync(DbContext ctx, bool _, CancellationToken ct)
+    {
+        var departments = DataSeeder.SeedDepartments();
+        await ctx.Set<Department>().AddRangeAsync(departments, ct);
+
+        var employees = DataSeeder.SeedEmployees(departments);
+        await ctx.Set<Employee>().AddRangeAsync(employees, ct);
+
+        await ctx.SaveChangesAsync(ct);
+    }
+}
