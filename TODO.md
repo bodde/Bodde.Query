@@ -16,6 +16,9 @@
 # Clean code
 - [ ] Remove all unnecessary usings
 
+# AspNetCore support
+- [ ] Create a project with bindable QueryCriteriaParameters
+
 
 # Code Coverage
 
