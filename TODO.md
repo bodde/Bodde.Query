@@ -2,7 +2,7 @@
 
 - [x] EF Core Console Sample
 - [x] EF Core with DI Console Sample
-- [ ] Minimal Api Sample
+- [x] Minimal Api Sample
 
 # Refactorings
 - [x] rename DefaultQueryTookit to QueryTookit with Default(...) static factory method

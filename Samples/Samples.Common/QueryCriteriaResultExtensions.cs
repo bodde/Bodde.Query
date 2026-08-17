@@ -22,8 +22,7 @@ public static class QueryCriteriaResultExtensions
             outputMethod($"Total Count: {result.TotalCount.Value}");
         }
 
-        var formattedQuery = queryToolkit.Formatter.Format(result.Criteria);
-        outputMethod($"Formatted Query: {formattedQuery}");
+        outputMethod($"Formatted Query: {result.Criteria}");
 
         outputMethod(string.Empty);
     }
