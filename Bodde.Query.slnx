@@ -1,9 +1,9 @@
 <Solution>
   <Folder Name="/Samples/">
-    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp.DependencyInjection/Bodde.Query.Samples.ConsoleApp.DependencyInjection.csproj" />
-    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp.EFCore/Bodde.Query.Samples.ConsoleApp.EFCore.csproj" />
-    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp/Bodde.Query.Samples.ConsoleApp.csproj" />    
-    <Project Path="Samples/Bodde.Query.Samples.Data/Bodde.Query.Samples.Data.csproj" />
+    <Project Path="Samples/Samples.ConsoleApp.DI/Samples.ConsoleApp.DI.csproj" />
+    <Project Path="Samples/Samples.ConsoleApp.EFCore/Samples.ConsoleApp.EFCore.csproj" />
+    <Project Path="Samples/Samples.ConsoleApp/Samples.ConsoleApp.csproj" />
+    <Project Path="Samples/Samples.Data/Samples.Data.csproj" />
   </Folder>
   <Project Path="Bodde.Query.Abstractions/Bodde.Query.Abstractions.csproj" />
   <Project Path="Bodde.Query.Core/Bodde.Query.Core.csproj" />

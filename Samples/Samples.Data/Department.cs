@@ -1,4 +1,4 @@
-﻿namespace Bodde.Query.Samples.Data;
+﻿namespace Samples.Data;
 
 public class Department
 {

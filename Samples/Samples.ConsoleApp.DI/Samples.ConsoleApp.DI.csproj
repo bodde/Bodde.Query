@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../Bodde.Query.Core/Bodde.Query.Core.csproj" />
-    <ProjectReference Include="../Bodde.Query.Samples.Data/Bodde.Query.Samples.Data.csproj" />
+    <ProjectReference Include="../Samples.Data/Samples.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

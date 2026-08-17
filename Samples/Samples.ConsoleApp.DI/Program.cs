@@ -1,7 +1,7 @@
 ﻿using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Core;
-using Bodde.Query.Samples.Data;
+using Samples.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
