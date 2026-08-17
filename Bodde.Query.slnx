@@ -4,8 +4,8 @@
   <Project Path="Bodde.Query.EntityFrameworkCore/Bodde.Query.EntityFrameworkCore.csproj" />
   <Project Path="Bodde.Query.Test/Bodde.Query.Test.csproj" />
   <Folder Name="/Samples/">
-    <Project Path="Samples/Samples.Data/Samples.Data.csproj" />
     <Project Path="Samples/Samples.ConsoleApp/Samples.ConsoleApp.csproj" />
+    <Project Path="Samples/Samples.Common/Samples.Common.csproj" />
     <Project Path="Samples/Samples.ConsoleApp.DI/Samples.ConsoleApp.DI.csproj" />
     <Project Path="Samples/Samples.ConsoleApp.EFCore/Samples.ConsoleApp.EFCore.csproj" />
     <Project Path="Samples/Samples.ConsoleApp.EFCore.DI/Samples.ConsoleApp.EFCore.DI.csproj" />

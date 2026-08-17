@@ -1,6 +1,6 @@
 ﻿using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Core;
-using Samples.Data;
+using Samples.Common;
 
 var queryToolkit = QueryToolkit.Default();
 

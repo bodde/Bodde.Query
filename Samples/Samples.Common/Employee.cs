@@ -1,4 +1,4 @@
-﻿namespace Samples.Data;
+﻿namespace Samples.Common;
 
 public class Employee
 {

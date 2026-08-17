@@ -1,7 +1,7 @@
 ﻿using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Core;
 using Bodde.Query.EntityFrameworkCore;
-using Samples.Data;
+using Samples.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
