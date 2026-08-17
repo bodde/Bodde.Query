@@ -1,7 +1,7 @@
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 
-namespace Bodde.Query.Core;
+namespace Bodde.Query.Abstractions.Extensions;
 
 public static class QueryableExtensions
 {

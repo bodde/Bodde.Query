@@ -1,9 +1,7 @@
-using Bodde.Query.Abstractions.Models;
+using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Abstractions.Services;
-using Bodde.Query.Core;
 using Bodde.Query.Test.Helpers;
 using Moq;
-using static Bodde.Query.Abstractions.Models.FilterCriteria;
 
 namespace Bodde.Query.Test;
 

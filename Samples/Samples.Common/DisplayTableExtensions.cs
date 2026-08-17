@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Bodde.Query.Samples.Data;
+namespace Samples.Common;
 
 public static class DisplayTableExtensions
 {

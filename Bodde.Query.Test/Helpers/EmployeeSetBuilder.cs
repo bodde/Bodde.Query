@@ -1,4 +1,3 @@
-using System;
 using Bodde.Query.Test.Models;
 
 namespace Bodde.Query.Test.Helpers;

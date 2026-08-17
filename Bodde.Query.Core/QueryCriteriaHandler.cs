@@ -20,7 +20,7 @@ internal class QueryCriteriaHandler(IExpressionBuilder expressionBuilder) : IQue
             ? ApplyPageCriteria(queryWithCriteria, criteria.Paging) 
             : queryWithCriteria;
 
-        return queryWithCriteria.Select(_ => _);
+        return queryWithCriteria;
     }
 
     private IQueryable<T> ApplyFilterCriteria<T>(IQueryable<T> query, FilterCriteria filter)

@@ -1,12 +1,13 @@
 <Solution>
-  <Folder Name="/Samples/">
-    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp.DependencyInjection/Bodde.Query.Samples.ConsoleApp.DependencyInjection.csproj" />
-    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp.EFCore/Bodde.Query.Samples.ConsoleApp.EFCore.csproj" />
-    <Project Path="Samples/Bodde.Query.Samples.ConsoleApp/Bodde.Query.Samples.ConsoleApp.csproj" />    
-    <Project Path="Samples/Bodde.Query.Samples.Data/Bodde.Query.Samples.Data.csproj" />
-  </Folder>
   <Project Path="Bodde.Query.Abstractions/Bodde.Query.Abstractions.csproj" />
   <Project Path="Bodde.Query.Core/Bodde.Query.Core.csproj" />
   <Project Path="Bodde.Query.EntityFrameworkCore/Bodde.Query.EntityFrameworkCore.csproj" />
   <Project Path="Bodde.Query.Test/Bodde.Query.Test.csproj" />
+  <Folder Name="/Samples/">
+    <Project Path="Samples/Samples.ConsoleApp/Samples.ConsoleApp.csproj" />
+    <Project Path="Samples/Samples.Common/Samples.Common.csproj" />
+    <Project Path="Samples/Samples.ConsoleApp.DI/Samples.ConsoleApp.DI.csproj" />
+    <Project Path="Samples/Samples.ConsoleApp.EFCore/Samples.ConsoleApp.EFCore.csproj" />
+    <Project Path="Samples/Samples.ConsoleApp.EFCore.DI/Samples.ConsoleApp.EFCore.DI.csproj" />
+  </Folder>
 </Solution>
