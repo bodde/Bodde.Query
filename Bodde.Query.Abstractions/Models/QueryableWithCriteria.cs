@@ -13,11 +13,12 @@ public record QueryableWithCriteria<TItem>(
 
     public IQueryable<TItem> OutputQuery => outputQueryable.Value;
 
+    public string FormattedCriteria => Toolkit.Formatter.Format(Criteria);
+
     public override string ToString()
     {
         var name = string.IsNullOrWhiteSpace(Name) ? "<unnamed>" : Name;
-        var criteria = Toolkit.Formatter.Format(Criteria);
 
-        return $"{name} ({criteria})";
+        return $"{name} ({FormattedCriteria})";
     }
 }
