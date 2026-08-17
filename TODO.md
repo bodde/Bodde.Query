@@ -1,7 +1,7 @@
 # Samples
 
 - [x] EF Core Console Sample
-- [ ] EF Core with DI Console Sample
+- [x] EF Core with DI Console Sample
 - [ ] Minimal Api Sample
 
 # Refactorings
