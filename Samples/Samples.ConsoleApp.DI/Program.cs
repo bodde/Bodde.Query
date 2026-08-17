@@ -5,6 +5,7 @@ using Samples.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Bodde.Query.Abstractions.Extensions;
 
 
 var builder = Host.CreateApplicationBuilder(args);

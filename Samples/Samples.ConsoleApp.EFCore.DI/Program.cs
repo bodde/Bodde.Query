@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Bodde.Query.Abstractions.Services;
+using Bodde.Query.Abstractions.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
 

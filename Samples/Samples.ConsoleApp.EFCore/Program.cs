@@ -3,6 +3,7 @@ using Bodde.Query.Core;
 using Bodde.Query.EntityFrameworkCore;
 using Samples.Common;
 using Microsoft.EntityFrameworkCore;
+using Bodde.Query.Abstractions.Extensions;
 
 using var ctx = new CompanyDbContext();
 

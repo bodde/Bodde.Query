@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../../Bodde.Query.Abstractions/Bodde.Query.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
