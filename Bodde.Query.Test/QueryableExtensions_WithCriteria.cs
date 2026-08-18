@@ -1,26 +1,33 @@
 using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Core;
+using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Test.Helpers;
 using Bodde.Query.Test.Models;
+using Moq;
 
 namespace Bodde.Query.Test;
 
 public class QueryableExtensions_WithCriteria
 {
+    private readonly Mock<IQueryToolkit> queryToolkit;
+
+    public QueryableExtensions_WithCriteria()
+    {
+        queryToolkit = new Mock<IQueryToolkit>();
+    }
+
     [Fact]
     public async Task Default()
     {
         var employees = EmployeeSetBuilder.Build().AsQueryable();
 
-        var queryToolkit = QueryToolkit.Default();
         var emptyCriteria = new QueryCriteria();
 
-        var sut = employees.WithCriteria(queryToolkit);
+        var sut = employees.WithCriteria(queryToolkit.Object);
 
         Assert.NotNull(sut);
         Assert.IsType<QueryableWithCriteria<Employee>>(sut);
-        Assert.Equal(queryToolkit, sut.Toolkit);
+        Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Empty(sut.Name);
         Assert.Equal(emptyCriteria, sut.Criteria);
         Assert.Equal(employees, sut.InputQuery);
@@ -31,15 +38,14 @@ public class QueryableExtensions_WithCriteria
     {
         var employees = EmployeeSetBuilder.Build().AsQueryable();
 
-        var queryToolkit = QueryToolkit.Default();
         var emptyCriteria = new QueryCriteria();
         var customName = "CustomQueryName";
 
-        var sut = employees.WithCriteria(customName,queryToolkit);
+        var sut = employees.WithCriteria(customName,queryToolkit.Object);
 
         Assert.NotNull(sut);
         Assert.IsType<QueryableWithCriteria<Employee>>(sut);
-        Assert.Equal(queryToolkit, sut.Toolkit);
+        Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Equal(customName, sut.Name);
         Assert.Equal(emptyCriteria, sut.Criteria);
         Assert.Equal(employees, sut.InputQuery);
@@ -51,14 +57,13 @@ public class QueryableExtensions_WithCriteria
         var employees = EmployeeSetBuilder.Build().AsQueryable();
         var salaryGreaterThan8000 = new FilterCriteria.ComparisonExpression("Salary", FilterCriteria.ComparisonOperator.GreaterThan, 80000);
 
-        var queryToolkit = QueryToolkit.Default();
         var customCriteria = new QueryCriteria(new(salaryGreaterThan8000));
 
-        var sut = employees.WithCriteria(customCriteria, queryToolkit);
+        var sut = employees.WithCriteria(customCriteria, queryToolkit.Object);
 
         Assert.NotNull(sut);
         Assert.IsType<QueryableWithCriteria<Employee>>(sut);
-        Assert.Equal(queryToolkit, sut.Toolkit);
+        Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Empty(sut.Name);
         Assert.Equal(customCriteria, sut.Criteria);
         Assert.Equal(employees, sut.InputQuery);
@@ -70,15 +75,14 @@ public class QueryableExtensions_WithCriteria
         var employees = EmployeeSetBuilder.Build().AsQueryable();
         var salaryGreaterThan8000 = new FilterCriteria.ComparisonExpression("Salary", FilterCriteria.ComparisonOperator.GreaterThan, 80000);
 
-        var queryToolkit = QueryToolkit.Default();
         var customCriteria = new QueryCriteria(new(salaryGreaterThan8000));
         var customName = "CustomQueryName";
 
-        var sut = employees.WithCriteria(customName, customCriteria, queryToolkit);
+        var sut = employees.WithCriteria(customName, customCriteria, queryToolkit.Object);
 
         Assert.NotNull(sut);
         Assert.IsType<QueryableWithCriteria<Employee>>(sut);
-        Assert.Equal(queryToolkit, sut.Toolkit);
+        Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Equal(customName, sut.Name);
         Assert.Equal(customCriteria, sut.Criteria);
         Assert.Equal(employees, sut.InputQuery);
