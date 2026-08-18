@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Core;
 using Moq;
