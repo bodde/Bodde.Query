@@ -17,7 +17,7 @@
 - [x] Remove all unnecessary usings
 
 # AspNetCore support
-- [ ] Create a project with bindable QueryCriteriaParameters
+- [x] Use AsParameters attribute to bind QueryString to QueryCriteriaParameters
 
 
 # Code Coverage
