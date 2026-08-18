@@ -24,11 +24,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(opt => opt
+        .WithClassicLayout()
+        .HideSearch()
+        .HideSidebar()
+        .ExpandAllModelSections()
+    );
 
     // redirect home to scalar
     app
-        .MapGet("/", () => Results.Redirect("scalar/#tag/samplesminimalapi/GET/employees"))
+        .MapGet("/", () => Results.Redirect("/scalar/#tag/samplesminimalapi/GET/employees"))
         .ExcludeFromDescription();
 }
 
