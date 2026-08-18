@@ -36,17 +36,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/employees", async (    
-    [FromQuery]int? skip,
-    [FromQuery]int? top,
-    [FromQuery]bool? count,
-    [FromQuery]string? filter,
-    [FromQuery]string? orderBy,
+    [AsParameters]QueryCriteriaParameters queryCriteria,
     EmployeesService service
     ) => 
     {
         try
         {       
-            var result = await service.GetAsync(new(skip, top, count, filter, orderBy));
+            var result = await service.GetAsync(queryCriteria);
             return Results.Ok(result);
         }
         catch(FormatException formatEx)
