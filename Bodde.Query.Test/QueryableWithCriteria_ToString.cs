@@ -1,40 +1,39 @@
 using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Core;
+using Bodde.Query.Abstractions.Services;
+using Bodde.Query.Test.Extensions;
 using Bodde.Query.Test.Helpers;
+using Bodde.Query.Test.Mocked;
 using Bodde.Query.Test.Models;
+using Moq;
 
 namespace Bodde.Query.Test;
 
 public class QueryableWithCriteria_ToString
-{
+{    
     [Fact]
     public void ToString_ReturnsExpectedString()
     {
-        var toolkit = QueryToolkit.Default();
+        var queryToolkit = new QueryToolkitMock();
 
         var employees = EmployeeSetBuilder.Build().AsQueryable();
         var queryName = "EmployeeQuery";
 
-        var salaryGreaterThan8000 = new FilterCriteria.ComparisonExpression("Salary", FilterCriteria.ComparisonOperator.GreaterThan, 80000);
-        var orderByLastName = new OrderByCriteria.OrderByItem("LastName", OrderByCriteria.SortDirection.Ascending);
-        var queryCriteria = new QueryCriteria
-        {
-            Filter = new (salaryGreaterThan8000),
-            OrderBy = new(orderByLastName),
-            Paging = new(Skip: 0, Top: 5, TotalCount: true)
-        };
+        var queryCriteria = new QueryCriteria();
 
-        var expectedFormattedCriteria = toolkit.Formatter.Format(queryCriteria);
+        var expectedFormattedString = "formattedString";
+        queryToolkit.Formatter
+            .Setup(_ => _.Format(It.Is<QueryCriteria>(_ => _ == queryCriteria)))
+            .Returns(expectedFormattedString);
 
         var sut = new QueryableWithCriteria<Employee>(
             queryName,
-            toolkit,
+            queryToolkit.Object,
             employees,
             queryCriteria
         );
 
         var actual = sut.ToString();
 
-        Assert.Equal($"{queryName} ({expectedFormattedCriteria})", actual);
+        Assert.Equal($"{queryName} ({expectedFormattedString})", actual);
     }
 }
