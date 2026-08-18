@@ -2,7 +2,7 @@ using Bodde.Query.Test.Models;
 
 namespace Bodde.Query.Test.Helpers;
 
-public class EmployeeSetBuilder
+internal class EmployeeSetBuilder
 {
     public static Employee[] Build()
     {

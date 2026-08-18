@@ -1,0 +1,23 @@
+using Bodde.Query.Abstractions.Extensions;
+using Bodde.Query.Abstractions.Models;
+using Bodde.Query.Test.Helpers;
+using Bodde.Query.Test.Models;
+using static Bodde.Query.Abstractions.Models.FilterCriteria;
+using static Bodde.Query.Abstractions.Models.OrderByCriteria;
+
+namespace Bodde.Query.Test.Extensions;
+
+public static class QueryCriteriaExtensions
+{
+    extension(QueryCriteria queryCriteria)
+    {
+        public QueryCriteria SalaryGreaterThan80000() 
+            => queryCriteria.WithFilter(QueryCriteriaItemBuilder.SalaryGreaterThan80000);
+
+        public QueryCriteria OrderByLastName() 
+            => queryCriteria.WithOrderBy(new(QueryCriteriaItemBuilder.OrderByLastName));
+
+        public QueryCriteria FirstPage() 
+            => queryCriteria.WithPaging(new(Skip: 0, Top: 5, TotalCount: true));
+    }
+}
