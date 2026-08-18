@@ -22,7 +22,7 @@ public class QueryToolkit(
         parser ??= new ODataParser();
         expressionBuilder ??= new ExpressionBuilder();
         handler ??= new QueryCriteriaHandler(expressionBuilder);
-        executor ??= new DefaultQueryExecutor();
+        executor ??= new LinqQueryExecutor();
 
         return new QueryToolkit(formatter, parser, expressionBuilder, handler, executor);
     }

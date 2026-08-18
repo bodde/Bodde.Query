@@ -27,7 +27,7 @@ public class QueryToolkit_ctor
         Assert.IsType<QueryCriteriaHandler>(handler);
 
         Assert.NotNull(executor);
-        Assert.IsType<DefaultQueryExecutor>(executor);
+        Assert.IsType<LinqQueryExecutor>(executor);
 
         Assert.NotNull(expressionBuilder);
         Assert.IsType<ExpressionBuilder>(expressionBuilder);

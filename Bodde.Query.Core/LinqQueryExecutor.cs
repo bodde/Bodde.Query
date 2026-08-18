@@ -1,6 +1,6 @@
 namespace Bodde.Query.Core;
 
-internal class DefaultQueryExecutor : QueryExecutor
+internal class LinqQueryExecutor : QueryExecutor
 {
     protected override int Count<T>(IQueryable<T> query) => query.Count();
 
