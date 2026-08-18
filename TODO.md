@@ -14,7 +14,7 @@
 - [x] Refactor everywhere with Moq dependencies
 
 # Clean code
-- [ ] Remove all unnecessary usings
+- [x] Remove all unnecessary usings
 
 # AspNetCore support
 - [ ] Create a project with bindable QueryCriteriaParameters

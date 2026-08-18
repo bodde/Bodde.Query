@@ -1,9 +1,6 @@
 using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Test.Helpers;
-using Bodde.Query.Test.Models;
-using static Bodde.Query.Abstractions.Models.FilterCriteria;
-using static Bodde.Query.Abstractions.Models.OrderByCriteria;
 
 namespace Bodde.Query.Test.Extensions;
 

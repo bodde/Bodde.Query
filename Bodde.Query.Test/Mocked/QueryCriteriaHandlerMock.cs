@@ -1,4 +1,3 @@
-using System;
 using Bodde.Query.Abstractions.Services;
 using Moq;
 

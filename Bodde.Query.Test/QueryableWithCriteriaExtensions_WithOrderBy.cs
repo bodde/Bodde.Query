@@ -1,6 +1,5 @@
 using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Test.Helpers;
 using Bodde.Query.Test.Mocked;
 using Bodde.Query.Test.Models;
