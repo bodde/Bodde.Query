@@ -240,20 +240,12 @@ internal class ExpressionBuilder : IExpressionBuilder
         return typeof(string).GetMethod(methodName, arguments)!;
     }
 
-    internal class ReplaceParameterVisitor : ExpressionVisitor
+    internal class ReplaceParameterVisitor(ParameterExpression oldParam, ParameterExpression newParam) : ExpressionVisitor
     {
-        private readonly ParameterExpression _oldParam;
-        private readonly ParameterExpression _newParam;
-
-        public ReplaceParameterVisitor(ParameterExpression oldParam, ParameterExpression newParam)
-        {
-            _oldParam = oldParam;
-            _newParam = newParam;
-        }
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            return node == _oldParam ? _newParam : base.VisitParameter(node);
+            return node == oldParam ? newParam : base.VisitParameter(node);
         }
     }
 }

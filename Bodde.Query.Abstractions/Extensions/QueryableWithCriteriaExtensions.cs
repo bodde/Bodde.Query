@@ -46,7 +46,7 @@ public static class QueryableWithCriteriaExtensions
             );
         }
 
-        public QueryableWithCriteria<T> WithPaging(int skip, int top, bool totalCount = true)
+        public QueryableWithCriteria<T> WithPaging(int? skip = null, int? top = null, bool? totalCount = null)
             => new(
                 query.Name,
                 query.Toolkit,
