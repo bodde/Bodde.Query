@@ -8,7 +8,7 @@
 - [x] rename DefaultQueryTookit to QueryTookit with Default(...) static factory method
 
 # Optimizations
-- [ ] Add ConfigureAwait(false) to every Bodde.Query.core awaited call
+- [x] Add ConfigureAwait(false) to every Bodde.Query.core awaited call
 
 # Tests
 - [ ] Refactor everywhere with Moq dependencies
