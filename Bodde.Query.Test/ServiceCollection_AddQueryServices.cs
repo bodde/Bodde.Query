@@ -44,7 +44,7 @@ public class ServiceCollection_AddQueryServices
 
         Assert.NotNull(queryExecutor);
         Assert.Equal(ServiceLifetime.Scoped, queryExecutor.Lifetime);
-        Assert.Equal(typeof(DefaultQueryExecutor), queryExecutor.ImplementationType);
+        Assert.Equal(typeof(LinqQueryExecutor), queryExecutor.ImplementationType);
     }
 
 	[Fact]

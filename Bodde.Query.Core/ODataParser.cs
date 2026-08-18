@@ -56,7 +56,7 @@ internal partial class ODataParser : IQueryCriteriaParser
             OrderBy: orderBy
         );
     }
-    
+
 
     public PagingCriteria ParsePaging(string pagingString)
     {
@@ -90,21 +90,9 @@ internal partial class ODataParser : IQueryCriteriaParser
     }
 
     public FilterCriteria ParseFilter(string filterString)
-    {        
-        var topLevelExpression = ParseFilterExpression(filterString);      
-        return new FilterCriteria(topLevelExpression);
-    }
-
-    public OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString)
     {
-        ArgumentNullException.ThrowIfNull(orderByString, nameof(orderByString));
-
-        var orderByItems = orderByString
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(_ => ParseOrderByItem(_))
-            .ToArray();
-
-        return orderByItems;
+        var topLevelExpression = ParseFilterExpression(filterString);
+        return new FilterCriteria(topLevelExpression);
     }
 
     public OrderByCriteria ParseOrderBy(string orderByString)
@@ -120,7 +108,7 @@ internal partial class ODataParser : IQueryCriteriaParser
             .Select(_ => ParseOrderByItem(_))
             .ToArray();
 
-        return new OrderByCriteria(orderByItems);     
+        return new OrderByCriteria(orderByItems);
     }
 
     private OrderByCriteria.OrderByItem ParseOrderByItem(string itemString)
@@ -143,10 +131,6 @@ internal partial class ODataParser : IQueryCriteriaParser
     private string ProcessComparisonExpressions(string filterString, Dictionary<string, FilterCriteria.FilterExpression> expressionsBag)
     {
         var comparisonStatements = GetComparisonStatements(filterString);
-        if (comparisonStatements.Length == 0)
-        {
-            throw new NotImplementedException("No comparison statements found in filter string.");
-        }
 
         foreach (var comparisonStatement in comparisonStatements)
         {
@@ -184,12 +168,8 @@ internal partial class ODataParser : IQueryCriteriaParser
         foreach (Match notMatch in notMatches)
         {
             var notStatement = notMatch.Value;
-            var innerExpressionKey = notMatch.Groups["key1"].Success
-                ? notMatch.Groups["key1"].Value
-                : notMatch.Groups["key2"].Success
-                ? notMatch.Groups["key2"].Value
-                : throw new InvalidOperationException("No valid group found for not expression.");
 
+            string innerExpressionKey = GetInnerExpressionKey(notMatch.Groups);
             var innerExpression = expressionsBag[innerExpressionKey];
 
             var notExpression = new FilterCriteria.NotExpression(innerExpression);
@@ -203,6 +183,18 @@ internal partial class ODataParser : IQueryCriteriaParser
         return filterString;
     }
 
+    private static string GetInnerExpressionKey(GroupCollection notMatchGroups)
+    {            
+        var notMatchKey1Group = notMatchGroups["key1"];
+        if(notMatchKey1Group != null && notMatchKey1Group.Success)
+            return notMatchKey1Group.Value;
+
+        var notMatchKey2Group = notMatchGroups["key2"];
+        if(notMatchKey2Group != null && notMatchKey2Group.Success)
+            return notMatchKey2Group.Value;
+
+        throw new InvalidOperationException("No valid group found for not expression.");  
+    }
 
     private static string[] GetInnerLogicalExpressions(string filterString)
     {
@@ -258,9 +250,7 @@ internal partial class ODataParser : IQueryCriteriaParser
         var expressionKeys = GetExpressionKeys(expressionString);
 
         if (expressionKeys.Length < 2)
-        {
             throw new InvalidOperationException("At least two expressions are required to create a logical expression.");
-        }
 
         var expressions = expressionKeys
             .Select(key => expressionsBag[key])
@@ -296,7 +286,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
         if (logicalOperators.Distinct().Count() > 1)
         {
-            throw new NotImplementedException("Only one logical operator per logical expression is supported.");
+            throw new FormatException("Only one logical operator per logical expression is supported.");
         }
 
         var logicalOperator = ConvertLogicalOperatorStringToEnum(logicalOperators[0]);
@@ -320,7 +310,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
         if (parts.Length != 3)
         {
-            throw new NotImplementedException("Only simple comparison expressions are supported in this example.");
+            throw new NotImplementedException("Only binary comparison expressions are supported.");
         }
 
         var propertyPath = parts[0];
@@ -361,7 +351,7 @@ internal partial class ODataParser : IQueryCriteriaParser
             var match = inValuesRegex.Match(valueString);
             if (!match.Success)
             {
-                throw new NotImplementedException("Invalid syntax for 'in' operator.");
+                throw new FormatException("Invalid syntax for 'in' operator.");
             }
 
             var valuesPart = match.Groups[1].Value;
@@ -372,7 +362,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
             if (valueTypes.DistinctBy(vt => vt.type).Count() > 1)
             {
-                throw new NotImplementedException("All values for 'in' operator must be of the same type.");
+                throw new FormatException("All values for 'in' operator must be of the same type.");
             }
 
             // convert to array of the appropriate type
@@ -435,7 +425,7 @@ internal partial class ODataParser : IQueryCriteriaParser
             return comparisonOperator;
         }
 
-        throw new InvalidOperationException($"OData operator '{operatorString}' is not supported. Supported operators are: {_comparisonOperators.Keys.ToCsv()}");
+        throw new FormatException($"OData operator '{operatorString}' is not supported. Supported operators are: {_comparisonOperators.Keys.ToCsv()}");
     }
 
     private static readonly Dictionary<string, FilterCriteria.ComparisonOperator> _comparisonOperators = new()
@@ -451,8 +441,8 @@ internal partial class ODataParser : IQueryCriteriaParser
         {"endswith", FilterCriteria.ComparisonOperator.EndsWith},
         {"in", FilterCriteria.ComparisonOperator.In}
     };
-    
-    [GeneratedRegex(@"([\w\.]+\s+(?:eq|ne|gt|ge|lt|le|contains|startswith|endswith|in)\s+(?:null|true|false|'[^']*'|\(.+\)|[\d\-T\:\.Z]+))", RegexOptions.IgnoreCase)]
+
+    [GeneratedRegex(@"([\w\.]+\s+(?:\w+)\s+(?:null|true|false|'[^']*'|[\d\-T\:\.Z]+|\((?:(?:null|true|false|'[^']*'|[\d\-T\:\.Z]+)(?:\s*,\s*)?)+\)))", RegexOptions.IgnoreCase)]
     private static partial Regex ComparisonStatementsRegex();
 
     [GeneratedRegex(@"\s+(and|or)\s+", RegexOptions.IgnoreCase)]

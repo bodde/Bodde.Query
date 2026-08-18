@@ -46,7 +46,7 @@ public static class QueryableWithCriteriaExtensions
             );
         }
 
-        public QueryableWithCriteria<T> WithPaging(int skip, int top, bool totalCount = true)
+        public QueryableWithCriteria<T> WithPaging(int? skip = null, int? top = null, bool? totalCount = null)
             => new(
                 query.Name,
                 query.Toolkit,
@@ -58,11 +58,10 @@ public static class QueryableWithCriteriaExtensions
 
         public QueryableWithCriteria<T> ForTotalCount()
         {
-            var (name, toolkit, queryable, criteria) = query;
-            var criteriaForCount = new QueryCriteria(Filter: criteria.Filter);
+            var (name, toolkit, inputQuery, criteria) = query;
             var queryForCountName = $"{name} Count";
 
-            return queryable.WithCriteria(queryForCountName, criteriaForCount, toolkit);
+            return inputQuery.WithCriteria(queryForCountName, criteria.ForTotalCount(), toolkit);
         }
 
         public QueryCriteriaResult<T> ToResult()

@@ -33,5 +33,9 @@ public static class QueryCriteriaExtensions
                 OrderBy: queryCriteria.OrderBy,
                 Paging: pagingCriteria
             );
+
+        
+        public QueryCriteria ForTotalCount()
+            => new(Filter: queryCriteria.Filter);
     }
 }

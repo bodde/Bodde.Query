@@ -95,6 +95,24 @@ public class QueryCriteriaHandler_ApplyCriteria
         Assert.Equal(expected.GetIdsCsv(), result.GetIdsCsv()); 
     }
 
+        [Fact]
+    public void FilterBy_Id_NotEquals_4()
+    {        
+        var id = 4;
+        var expected = data.Where(e => e.Id != id).ToArray();
+
+        var criteria = new QueryCriteria(
+            Filter: new FilterCriteria(new FilterCriteria.ComparisonExpression(
+                PropertyPath: nameof(Employee.Id),
+                Operator: COp.NotEquals,
+                Value: id
+                )
+            ));      
+        var result = sut.ApplyCriteria(data, criteria).ToArray();
+
+        Assert.Equal(expected.GetIdsCsv(), result.GetIdsCsv()); 
+    }
+
     [Fact]
     public void FilterBy_FirstName_Equals_James()
     {        
@@ -118,11 +136,11 @@ public class QueryCriteriaHandler_ApplyCriteria
     public void FilterBy_HireDate_LessThan_2016()
     {
         var date = new DateTime(2016, 1, 1);
-        var expected = data.Where(e => e.HireDate < date).ToArray();
+        var expected = data.Where(e => e.HireDateTimeOffset < date).ToArray();
 
         var criteria = new QueryCriteria(
             Filter: new FilterCriteria(new FilterCriteria.ComparisonExpression(
-                PropertyPath: nameof(Employee.HireDate),
+                PropertyPath: nameof(Employee.HireDateTimeOffset),
                 Operator: COp.LessThan,
                 Value: date
                 )
@@ -291,7 +309,7 @@ public class QueryCriteriaHandler_ApplyCriteria
         var salary = 60000m;
         var hireDate = new DateTime(2020, 1, 1);
         var expected = data
-            .Where(e => e.IsActive == isActive && e.Salary > salary && e.HireDate < hireDate)
+            .Where(e => e.IsActive == isActive && e.Salary > salary && e.HireDateTimeOffset < hireDate)
             .ToArray();
 
         var criteria = new QueryCriteria(
@@ -300,7 +318,7 @@ public class QueryCriteriaHandler_ApplyCriteria
                     Operator: LOp.And,
                     new FilterCriteria.ComparisonExpression(nameof(Employee.IsActive), COp.Equals, isActive),
                     new FilterCriteria.ComparisonExpression(nameof(Employee.Salary), COp.GreaterThan, salary),
-                    new FilterCriteria.ComparisonExpression(nameof(Employee.HireDate), COp.LessThan, hireDate)
+                    new FilterCriteria.ComparisonExpression(nameof(Employee.HireDateTimeOffset), COp.LessThan, hireDate)
                 )
             ));
 
@@ -339,7 +357,7 @@ public class QueryCriteriaHandler_ApplyCriteria
         var startDate = new DateTime(2015, 1, 1);
         var endDate = new DateTime(2018, 12, 31);
         var expected = data
-            .Where(e => e.IsActive == isActive || (e.HireDate >= startDate && e.HireDate <= endDate))
+            .Where(e => e.IsActive == isActive || (e.HireDateTimeOffset >= startDate && e.HireDateTimeOffset <= endDate))
             .ToArray();
 
         var criteria = new QueryCriteria(
@@ -349,8 +367,8 @@ public class QueryCriteriaHandler_ApplyCriteria
                     new FilterCriteria.ComparisonExpression(nameof(Employee.IsActive), COp.Equals, isActive),
                     new FilterCriteria.LogicalExpression(
                         Operator: LOp.And,
-                        new FilterCriteria.ComparisonExpression(nameof(Employee.HireDate), COp.GreaterThanOrEqual, startDate),
-                        new FilterCriteria.ComparisonExpression(nameof(Employee.HireDate), COp.LessThanOrEqual, endDate)
+                        new FilterCriteria.ComparisonExpression(nameof(Employee.HireDateTimeOffset), COp.GreaterThanOrEqual, startDate),
+                        new FilterCriteria.ComparisonExpression(nameof(Employee.HireDateTimeOffset), COp.LessThanOrEqual, endDate)
                     )
                 )
             ));
@@ -383,12 +401,23 @@ public class QueryCriteriaHandler_ApplyCriteria
     }
 
     [Fact]
-    public void OrderBy_None()
+    public void OrderBy_Null_None()
     {
         var expected = data.ToArray();
 
-        var criteria = new QueryCriteria(
-            OrderBy: null);
+        var criteria = new QueryCriteria(OrderBy: null);
+
+        var result = sut.ApplyCriteria(data, criteria).ToArray();
+
+        Assert.Equal(expected.GetIdsCsv(), result.GetIdsCsv());
+    }
+        
+    [Fact]
+    public void OrderBy_Empty_None()
+    {
+        var expected = data.ToArray();
+
+        var criteria = new QueryCriteria(OrderBy: new());
 
         var result = sut.ApplyCriteria(data, criteria).ToArray();
 
@@ -414,6 +443,24 @@ public class QueryCriteriaHandler_ApplyCriteria
     }
 
     [Fact]
+    public void OrderBy_FirstName_Descending()
+    {
+        var expected = data.OrderByDescending(e => e.FirstName).ToArray();
+
+        var criteria = new QueryCriteria(
+            OrderBy: new OrderByCriteria(
+                new OrderByCriteria.OrderByItem(
+                    PropertyPath: nameof(Employee.FirstName),
+                    Direction: OrderByCriteria.SortDirection.Descending
+                )
+            ));
+
+        var result = sut.ApplyCriteria(data, criteria).ToArray();
+
+        Assert.Equal(expected.GetIdsCsv(), result.GetIdsCsv());
+    }
+
+    [Fact]
     public void OrderBy_Department_Name_Ascending_Then_By_Salary_Descending()
     {
         var expected = data
@@ -429,6 +476,31 @@ public class QueryCriteriaHandler_ApplyCriteria
                 new OrderByCriteria.OrderByItem(
                     PropertyPath: nameof(Employee.Salary),
                     Direction: OrderByCriteria.SortDirection.Descending
+                )
+            ));
+
+        var result = sut.ApplyCriteria(data, criteria).ToArray();
+
+        Assert.Equal(expected.GetIdsCsv(), result.GetIdsCsv());
+    }
+
+
+    [Fact]
+    public void OrderBy_Department_Name_Descending_Then_By_Salary_Ascending()
+    {
+        var expected = data
+            .OrderByDescending(e => e.Department!.DepartmentName)
+            .ThenBy(e => e.Salary).ToArray();
+
+        var criteria = new QueryCriteria(
+            OrderBy: new OrderByCriteria(
+                new OrderByCriteria.OrderByItem(
+                    PropertyPath: "Department.DepartmentName",
+                    Direction: OrderByCriteria.SortDirection.Descending
+                ),
+                new OrderByCriteria.OrderByItem(
+                    PropertyPath: nameof(Employee.Salary),
+                    Direction: OrderByCriteria.SortDirection.Ascending
                 )
             ));
 

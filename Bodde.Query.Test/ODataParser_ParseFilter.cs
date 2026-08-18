@@ -1,6 +1,8 @@
+using System.Reflection;
 using Bodde.Common.Extensions;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Core;
+using static Bodde.Query.Abstractions.Models.FilterCriteria;
 
 namespace Bodde.Query.Test;
 
@@ -13,12 +15,29 @@ public class ODataParser_ParseFilter
         sut = new ODataParser();
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("$filter=")]
-    public void EmptyString_Throw_FormatException(string input)
+
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+    [Fact]
+    public void Null_Throw_ArgumentNullException()
     {
-        Assert.Throws<FormatException>(() => sut.ParseFilter(input));
+        Assert.Throws<ArgumentNullException>(() => sut.ParseFilter(null));
+    }
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+
+    private const string NoComparisonStatements = "No comparison statements found in filter string.";
+
+    [Theory]
+    [InlineData("x", NoComparisonStatements)]
+    [InlineData("x eq", NoComparisonStatements)]
+    [InlineData("x in ()", NoComparisonStatements)]
+    [InlineData("x in 1", "Invalid syntax for 'in' operator.")]
+    [InlineData("x in (1,'a')", "All values for 'in' operator must be of the same type.")]
+    [InlineData("x off 'a'", "OData operator 'off' is not supported. Supported operators are: eq,ne,gt,ge,lt,le,contains,startswith,endswith,in")]
+    [InlineData("x gt 1 and y startswith 'J' or z eq 5", "Only one logical operator per logical expression is supported.")]
+    public void BadFormatInput_Throw_FormatException(string input, string expectedMessage)
+    {
+        var ex = Assert.Throws<FormatException>(() => sut.ParseFilter(input));
+        Assert.Equal(expectedMessage, ex.Message);
     }
 
     [Fact]
@@ -29,9 +48,9 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "Name",
-                Operator: FilterCriteria.ComparisonOperator.Equals,
+                Operator: ComparisonOperator.Equals,
                 Value: "John"
             )
         );
@@ -47,16 +66,16 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "Name",
-                Operator: FilterCriteria.ComparisonOperator.Equals,
+                Operator: ComparisonOperator.Equals,
                 Value: "John"
             )
         );
 
         Assert.Equal(expected, result);
     }
-
+    
     [Fact]
     public void SimpleEqualsNull()
     {
@@ -65,9 +84,9 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "Name",
-                Operator: FilterCriteria.ComparisonOperator.Equals,
+                Operator: ComparisonOperator.Equals,
                 Value: null
             )
         );
@@ -83,15 +102,17 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "Age",
-                Operator: FilterCriteria.ComparisonOperator.GreaterThan,
+                Operator: ComparisonOperator.GreaterThan,
                 Value: 30
             )
         );
 
         Assert.Equal(expected, result);
     }
+
+
 
     [Fact]
     public void SimpleContainsFilter()
@@ -101,9 +122,9 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "Description",
-                Operator: FilterCriteria.ComparisonOperator.Contains,
+                Operator: ComparisonOperator.Contains,
                 Value: "test"
             )
         );
@@ -119,13 +140,13 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expectedValues = new[] { 1, 2, 3 };
-        var expected = new FilterCriteria.ComparisonExpression(
+        var expected = new ComparisonExpression(
                 PropertyPath: "Id",
-                Operator: FilterCriteria.ComparisonOperator.In,
+                Operator: ComparisonOperator.In,
                 Value: expectedValues
             );  
 
-        var actual = result?.Expression as FilterCriteria.ComparisonExpression;
+        var actual = result?.Expression as ComparisonExpression;
         Assert.NotNull(actual);
         Assert.Equal(expected.PropertyPath, actual!.PropertyPath);
         Assert.Equal(expected.Operator, actual.Operator);
@@ -143,9 +164,9 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "DeletedAt",
-                Operator: FilterCriteria.ComparisonOperator.Equals,
+                Operator: ComparisonOperator.Equals,
                 Value: null
             )
         );
@@ -162,9 +183,9 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "CreatedAt",
-                Operator: FilterCriteria.ComparisonOperator.GreaterThanOrEqual,
+                Operator: ComparisonOperator.GreaterThanOrEqual,
                 Value: dateTime
             )
         );
@@ -180,9 +201,9 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.ComparisonExpression(
+            new ComparisonExpression(
                 PropertyPath: "IsActive",
-                Operator: FilterCriteria.ComparisonOperator.Equals,
+                Operator: ComparisonOperator.Equals,
                 Value: true
             )
         );
@@ -198,16 +219,16 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.LogicalExpression(
-                Operator: FilterCriteria.LogicalOperator.And,
-                First: new FilterCriteria.ComparisonExpression(
+            new LogicalExpression(
+                Operator: LogicalOperator.And,
+                First: new ComparisonExpression(
                     PropertyPath: "Age",
-                    Operator: FilterCriteria.ComparisonOperator.GreaterThan,
+                    Operator: ComparisonOperator.GreaterThan,
                     Value: 25
                 ),
-                Second: new FilterCriteria.ComparisonExpression(
+                Second: new ComparisonExpression(
                     PropertyPath: "Name",
-                    Operator: FilterCriteria.ComparisonOperator.StartsWith,
+                    Operator: ComparisonOperator.StartsWith,
                     Value: "J"
                 )
             )
@@ -217,17 +238,49 @@ public class ODataParser_ParseFilter
     }
 
     [Fact]
-    public void Not_Filter()
+    public void Filter1_And_Filter2_And_Filter3()
     {
-        var input = "not (IsActive eq true)";
+        var input = "Age gt 25 and Name startswith 'J' and Role eq 'Developer'";
 
         var result = sut.ParseFilter(input);
 
+        var expectedLogicalExpression = new LogicalExpression(
+                Operator: LogicalOperator.And,
+                new ComparisonExpression(
+                    PropertyPath: "Age",
+                    Operator: ComparisonOperator.GreaterThan,
+                    Value: 25
+                ),
+                new ComparisonExpression(
+                    PropertyPath: "Name",
+                    Operator: ComparisonOperator.StartsWith,
+                    Value: "J"
+                ),        
+                new ComparisonExpression(
+                    PropertyPath: "Role",
+                    Operator: ComparisonOperator.Equals,
+                    Value: "Developer"
+                )
+            );
+
+        var actualLogicalExpression = result.Expression as LogicalExpression;
+
+        Assert.NotNull(actualLogicalExpression);
+        Assert.Equal(expectedLogicalExpression.AllExpressions, actualLogicalExpression.AllExpressions);
+    }
+
+    [Theory]
+    [InlineData("not IsActive eq true")]
+    [InlineData("not (IsActive eq true)")]
+    public void Not_Filter(string input)
+    {
+        var result = sut.ParseFilter(input);
+
         var expected = new FilterCriteria(
-            new FilterCriteria.NotExpression(
-                new FilterCriteria.ComparisonExpression(
+            new NotExpression(
+                new ComparisonExpression(
                     PropertyPath: "IsActive",
-                    Operator: FilterCriteria.ComparisonOperator.Equals,
+                    Operator: ComparisonOperator.Equals,
                     Value: true
                 )
             )
@@ -245,17 +298,17 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.NotExpression(
-                new FilterCriteria.LogicalExpression(
-                    Operator: FilterCriteria.LogicalOperator.And,
-                    First: new FilterCriteria.ComparisonExpression(
+            new NotExpression(
+                new LogicalExpression(
+                    Operator: LogicalOperator.And,
+                    First: new ComparisonExpression(
                         PropertyPath: "IsActive",
-                        Operator: FilterCriteria.ComparisonOperator.Equals,
+                        Operator: ComparisonOperator.Equals,
                         Value: true
                     ),
-                    Second: new FilterCriteria.ComparisonExpression(
+                    Second: new ComparisonExpression(
                         PropertyPath: "Age",
-                        Operator: FilterCriteria.ComparisonOperator.LessThan,
+                        Operator: ComparisonOperator.LessThan,
                         Value: 18
                     )
                 )
@@ -273,24 +326,24 @@ public class ODataParser_ParseFilter
         var result = sut.ParseFilter(input);
 
         var expected = new FilterCriteria(
-            new FilterCriteria.LogicalExpression(
-                Operator: FilterCriteria.LogicalOperator.And,
-                First: new FilterCriteria.ComparisonExpression(
+            new LogicalExpression(
+                Operator: LogicalOperator.And,
+                First: new ComparisonExpression(
                     PropertyPath: "Age",
-                    Operator: FilterCriteria.ComparisonOperator.GreaterThan,
+                    Operator: ComparisonOperator.GreaterThan,
                     Value: 30
                 ),
-                Second: new FilterCriteria.LogicalExpression(
-                    Operator: FilterCriteria.LogicalOperator.Or,
-                    First: new FilterCriteria.ComparisonExpression(
+                Second: new LogicalExpression(
+                    Operator: LogicalOperator.Or,
+                    First: new ComparisonExpression(
                         PropertyPath: "Name",
-                        Operator: FilterCriteria.ComparisonOperator.Contains,
+                        Operator: ComparisonOperator.Contains,
                         Value: "Smith"
                     ),
-                    Second: new FilterCriteria.NotExpression(
-                        new FilterCriteria.ComparisonExpression(
+                    Second: new NotExpression(
+                        new ComparisonExpression(
                             PropertyPath: "IsActive",
-                            Operator: FilterCriteria.ComparisonOperator.Equals,
+                            Operator: ComparisonOperator.Equals,
                             Value: false
                         )
                     )

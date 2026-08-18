@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
         Type expressionBuilderType = typeof(ExpressionBuilder);
         Type queryCriteriaFormatterType = typeof(ODataFormatter);
         Type queryCriteriaParserType = typeof(ODataParser);
-        Type queryExecutorType = typeof(DefaultQueryExecutor);
+        Type queryExecutorType = typeof(LinqQueryExecutor);
 
         public List<ServiceDescriptor> Build()
         {
