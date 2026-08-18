@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Bodde.Query.Abstractions.Services;
+using Samples.Common.EFCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -24,7 +25,8 @@ class QueryTesterService(CompanyDbContext ctx, IQueryToolkit queryToolkit, IHost
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await InitializeDatabaseAsync(ctx);
+        Console.WriteLine($"Initializing database {CompanyDbContext.DbPath}");
+        await ctx.EnsureRecreatedAsync(stoppingToken);
 
         var testExecutor = new QueryTester(ctx.Employees, _ => Console.WriteLine(_), queryToolkit);
         await testExecutor.ExecuteAsync();
@@ -37,31 +39,5 @@ class QueryTesterService(CompanyDbContext ctx, IQueryToolkit queryToolkit, IHost
         Console.WriteLine($"Initializing {CompanyDbContext.DbPath}");
         await ctx.Database.EnsureDeletedAsync();
         await ctx.Database.EnsureCreatedAsync();
-    }
-}
-
-internal class CompanyDbContext : DbContext
-{
-    public static string DbPath => Path.Combine(Path.GetTempPath(), "companies.db");
-
-    public DbSet<Department> Departments { get; set; }
-    public DbSet<Employee> Employees { get; set; }
-
-    // The following configures EF to create a Sqlite database file in the
-    // special "local" folder for your platform.
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options
-            .UseSqlite($"Data Source={DbPath}")
-            .UseAsyncSeeding(SeedDataAsync);
-
-    private async Task SeedDataAsync(DbContext ctx, bool _, CancellationToken ct)
-    {
-        var departments = DataSeeder.SeedDepartments();
-        await ctx.Set<Department>().AddRangeAsync(departments, ct);
-
-        var employees = DataSeeder.SeedEmployees(departments);
-        await ctx.Set<Employee>().AddRangeAsync(employees, ct);
-
-        await ctx.SaveChangesAsync(ct);
     }
 }

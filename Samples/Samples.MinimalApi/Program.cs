@@ -7,6 +7,7 @@ using Bodde.Query.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Samples.Common;
+using Samples.Common.EFCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,32 +101,6 @@ internal class EmployeesService(
     }
 }
 
-internal class CompanyDbContext : DbContext
-{
-    public static string DbPath => Path.Combine(Path.GetTempPath(), "companies.db");
-
-    public DbSet<Department> Departments { get; set; }
-    public DbSet<Employee> Employees { get; set; }
-
-    // The following configures EF to create a Sqlite database file in the
-    // special "local" folder for your platform.
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options
-            .UseSqlite($"Data Source={DbPath}")
-            .UseAsyncSeeding(SeedDataAsync);
-
-    private async Task SeedDataAsync(DbContext ctx, bool _, CancellationToken ct)
-    {
-        var departments = DataSeeder.SeedDepartments();
-        await ctx.Set<Department>().AddRangeAsync(departments, ct);
-
-        var employees = DataSeeder.SeedEmployees(departments);
-        await ctx.Set<Employee>().AddRangeAsync(employees, ct);
-
-        await ctx.SaveChangesAsync(ct);
-    }
-}
-
 internal class InitializeDatabaseService(
     IServiceScopeFactory serviceScopeFactory, 
     ILogger<InitializeDatabaseService> logger
@@ -133,13 +108,12 @@ internal class InitializeDatabaseService(
 {
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {        
-        logger.LogInformation("Initializing {dbPath}", CompanyDbContext.DbPath);
-        
+    {
+        logger.LogInformation("Initializing database {dbPath}", CompanyDbContext.DbPath);
+
         using var scope = serviceScopeFactory.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
 
-        await ctx.Database.EnsureDeletedAsync(stoppingToken);
-        await ctx.Database.EnsureCreatedAsync(stoppingToken);
+        await ctx.EnsureRecreatedAsync(stoppingToken);
     }
 }
