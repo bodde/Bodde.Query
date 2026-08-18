@@ -1,6 +1,7 @@
-using Bodde.Query.Abstractions.Models;
+using System.Globalization;
 using Bodde.Query.Core;
 using Bodde.Query.Test.Models;
+using static Bodde.Query.Abstractions.Models.FilterCriteria;
 using COp = Bodde.Query.Abstractions.Models.FilterCriteria.ComparisonOperator;
 using LOp = Bodde.Query.Abstractions.Models.FilterCriteria.LogicalOperator;
 
@@ -22,9 +23,9 @@ public class ExpressionBuilder_CreateFilterExpression
     [Fact]
     public void Throws_OnInvalidLogicalExpression_WithSingleExpression()
     {
-        var filterExpression = new FilterCriteria.LogicalExpression(
+        var filterExpression = new LogicalExpression(
             LOp.And,
-            new FilterCriteria.ComparisonExpression(nameof(Employee.Salary), COp.GreaterThan, 10000),
+            new ComparisonExpression(nameof(Employee.Salary), COp.GreaterThan, 10000),
             null
         );
 
@@ -32,38 +33,51 @@ public class ExpressionBuilder_CreateFilterExpression
     }
 
     [Fact]
+    public void ParameterType_Employee()
+    {
+        var filterExpression = new ComparisonExpression(nameof(Employee.Salary), COp.GreaterThan, 10000);
+        
+        var actual = sut.CreateFilterExpression<Employee>(filterExpression);
+
+        Assert.Equal(typeof(Employee), actual.Parameters.First().Type);
+    }
+
+    [Fact]
     public void ComparisonExpression_DateTime_ConvertedTo_DateTimeOffset()
     {
-        var dateTime = DateTime.Parse("2024-01-01T12:00:00Z", null, System.Globalization.DateTimeStyles.RoundtripKind);
+        var dateTime = DateTime.Parse("2024-01-01T12:00:00Z", provider: null, DateTimeStyles.RoundtripKind);
 
-        var filterExpression = new FilterCriteria.ComparisonExpression(
+        var filterExpression = new ComparisonExpression(
             PropertyPath: nameof(Employee.HireDate),
             Operator: COp.GreaterThan,
             Value: dateTime
         );
 
-        var result = sut.CreateFilterExpression<Employee>(filterExpression);
+        var actual = sut.CreateFilterExpression<Employee>(filterExpression);
 
-        Assert.NotNull(result);
-        var parameter = result.Parameters[0];
-        Assert.Equal(typeof(Employee), parameter.Type);
+        var binaryExpression = actual.Body as System.Linq.Expressions.BinaryExpression;
+        Assert.NotNull(binaryExpression);
+
+        Assert.Equal(typeof(DateTimeOffset), binaryExpression.Right.Type);
     }
 
     [Fact]
     public void ComparisonExpression_PropertyType_Long_In_Integer_Values()
     {
-        var value = new[] { 0, 1 };
-        var filterExpression = new FilterCriteria.ComparisonExpression(
-            PropertyPath: nameof(Employee.Id),
+        int[] intValues = [0, 1];
+        var filterExpression = new ComparisonExpression(
+            PropertyPath: nameof(Employee.Id),  // property type is long
             Operator: COp.In,
-            Value: value
+            Value: intValues
         );
 
-        var result = sut.CreateFilterExpression<Employee>(filterExpression);
+        var actual = sut.CreateFilterExpression<Employee>(filterExpression);
 
-        Assert.NotNull(result);
-        var parameter = result.Parameters[0];
-        Assert.Equal(typeof(Employee), parameter.Type);
+        var methodCallExpression = actual.Body as System.Linq.Expressions.MethodCallExpression;
+        Assert.NotNull(methodCallExpression);   // in operator transformed into IEnumerable.Contains method
+
+        var actualValues = methodCallExpression.Arguments.First();
+        Assert.Equal(typeof(IEnumerable<long>), actualValues.Type);
     }
 
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -78,7 +92,7 @@ public class ExpressionBuilder_CreateFilterExpression
         Assert.Equal("Filter expression type UnsupportedFilterExpression is not implemented.", exception.Message);
     }
 
-    record UnsupportedFilterExpression : FilterCriteria.FilterExpression
+    record UnsupportedFilterExpression : FilterExpression
     {
     }
 
