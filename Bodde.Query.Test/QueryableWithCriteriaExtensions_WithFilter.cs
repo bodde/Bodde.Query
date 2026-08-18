@@ -11,8 +11,8 @@ namespace Bodde.Query.Test;
 
 public class QueryableWithCriteriaExtensions_WithFilter
 {
-    private QueryToolkitMock toolkit;
-    private QueryableWithCriteria<Employee> sut;
+    private readonly QueryToolkitMock toolkit;
+    private readonly QueryableWithCriteria<Employee> sut;
 
     public QueryableWithCriteriaExtensions_WithFilter()
     {
