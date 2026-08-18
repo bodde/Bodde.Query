@@ -19,6 +19,11 @@ public class QueryableWithCriteriaExtensions_WithPaging
     
     [Theory]
     [InlineData(null, null, null)]
+    [InlineData(10, null, null)]
+    [InlineData(null, 10, null)]
+    [InlineData(null, null, false)]
+    [InlineData(null, null, true)]
+    [InlineData(20, 10, true)]
     public void Test(int? skip, int? top, bool? totalCount)
     {
         var actual = sut.WithPaging(skip, top, totalCount);

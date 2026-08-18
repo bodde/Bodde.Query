@@ -90,7 +90,6 @@ internal class ExpressionBuilder : IExpressionBuilder
     private static ConstantExpression CreateConstantExpression(FilterCriteria.ComparisonExpression comparisonExpression, Expression property)
     {
         var value = GetValueFromExpression(comparisonExpression, property);
-        ValidateValueTypeOrThrow(comparisonExpression, value);
 
         var constantType = CreateConstantType(comparisonExpression, property);
 
@@ -102,17 +101,6 @@ internal class ExpressionBuilder : IExpressionBuilder
         return comparisonExpression.Operator == FilterCriteria.ComparisonOperator.In
             ? typeof(IEnumerable<>).MakeGenericType(property.Type)
             : property.Type;
-    }
-
-    private static void ValidateValueTypeOrThrow(FilterCriteria.ComparisonExpression comparisonExpression, object? value)
-    {
-        if (comparisonExpression.Operator == FilterCriteria.ComparisonOperator.In)
-        {
-            if (value is not System.Collections.IEnumerable enumerableValue)
-            {
-                throw new InvalidOperationException("Value for 'In' operator must be a collection.");
-            }
-        }
     }
 
     private static void ValidateOperatorOrThrow(FilterCriteria.ComparisonExpression comparisonExpression, Expression property)
@@ -162,7 +150,6 @@ internal class ExpressionBuilder : IExpressionBuilder
     {
         var value = comparisonExpression.Value;
 
-
         if (value == null)
             return null;
 
@@ -179,7 +166,7 @@ internal class ExpressionBuilder : IExpressionBuilder
             return new DateTimeOffset((DateTime)value);
         }
 
-         if(valueType == typeof(DateTimeOffset) && propertyType == typeof(DateTime))
+        if(valueType == typeof(DateTimeOffset) && propertyType == typeof(DateTime))
         {
             return ((DateTimeOffset)value).DateTime;
         }

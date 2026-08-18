@@ -17,6 +17,4 @@ public interface IQueryCriteriaParser
     FilterCriteria.FilterExpression ParseFilterExpression(string filterString);
 
     OrderByCriteria ParseOrderBy(string orderByString);
-
-    OrderByCriteria.OrderByItem[] ParseOrderByItems(string orderByString);
 }

@@ -12,7 +12,9 @@ public class Employee : IIdentifiable<long>
 
     public RoleType Role { get; set; }
 
-    public DateTimeOffset HireDate { get; set; }
+    public DateTimeOffset HireDateTimeOffset { get; set; }
+
+    public DateTime HireDate => HireDateTimeOffset.Date;
 
     public decimal Salary { get; set; }
 

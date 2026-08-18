@@ -40,10 +40,9 @@ internal class QueryCriteriaHandler(IExpressionBuilder expressionBuilder) : IQue
         }
 
         bool isFirst = true;
-        ParameterExpression parameter = expressionBuilder.CreateParameterExpression<T>();
         foreach (var orderByItem in orderBy.Items)
         {   
-            var propertyPathExpression = expressionBuilder.CreatePropertyOrFieldExpressionFromPath<T>(orderByItem.PropertyPath, parameter);
+            var propertyPathExpression = expressionBuilder.CreatePropertyOrFieldExpressionFromPath<T>(orderByItem.PropertyPath);
 
             // apply order by item to query
             if (isFirst)
