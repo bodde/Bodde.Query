@@ -11,19 +11,19 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Logging.ClearProviders();
 
+builder.Services.AddDbContext<CompanyDbContext>();
 builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
+
 builder.Services.AddHostedService<QueryTesterService>();
 
 var host = builder.Build();
 host.Run();
 
 
-class QueryTesterService(IQueryToolkit queryToolkit, IHostApplicationLifetime hostApplicationLifetime) : BackgroundService
+class QueryTesterService(CompanyDbContext ctx, IQueryToolkit queryToolkit, IHostApplicationLifetime hostApplicationLifetime) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var ctx = new CompanyDbContext();
-
         await InitializeDatabaseAsync(ctx);
 
         var testExecutor = new QueryTester(ctx.Employees, _ => Console.WriteLine(_), queryToolkit);
