@@ -20,22 +20,7 @@ public class QueryExecutor_ToResult
     public void TotalCount_Not_Required(bool? totalCount)
     {
         var data = EmployeeSetBuilder.Build();
-        var expectedDataQuery = data.Take(3).AsQueryable();
-        var expectedData = expectedDataQuery.ToArray();
-        var criteria = new QueryCriteria(Paging: new(TotalCount: totalCount));
-                
-        var queryableWithCriteria = new QueryableWithCriteria<Employee>(
-            Name: "Test",
-            Toolkit: toolkit.Object,
-            InputQuery: data.AsQueryable(),
-            Criteria: criteria
-        );
-
-        // LinqQueryExecutor uses Handler.ApplyCriteria to build the query
-        // ApplyCriteria set up to return expectedData despite of arguments (not the test purpose)
-        toolkit.Handler
-            .Setup(_ => _.ApplyCriteria(queryableWithCriteria.InputQuery, criteria))
-            .Returns(expectedDataQuery);
+        var queryableWithCriteria = Arrange(data, totalCount, out var expectedData);
 
         var actual = sut.ToResult(queryableWithCriteria);
 
@@ -47,17 +32,53 @@ public class QueryExecutor_ToResult
     public void TotalCount_Required()
     {
         var data = EmployeeSetBuilder.Build();
+        var queryableWithCriteria = Arrange(data, totalCount: true, out var expectedData);
+
+        var actual = sut.ToResult(queryableWithCriteria);
+
+        Assert.Equal(expectedData, actual.Items);
+        Assert.Equal(data.Length, actual.TotalCount);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(false)]
+    public async Task Async_TotalCount_Not_Required(bool? totalCount)
+    {
+        var data = EmployeeSetBuilder.Build();
+        var queryableWithCriteria = Arrange(data, totalCount, out var expectedData);
+
+        var actual = await sut.ToResultAsync(queryableWithCriteria);
+
+        Assert.Equal(expectedData, actual.Items);
+        Assert.Null(actual.TotalCount);
+    }
+
+
+    [Fact]
+    public async Task Async_TotalCount_Required()
+    {
+        var data = EmployeeSetBuilder.Build();
+        var queryableWithCriteria = Arrange(data, totalCount: true, out var expectedData);
+
+        var actual = await sut.ToResultAsync(queryableWithCriteria);
+
+        Assert.Equal(expectedData, actual.Items);
+        Assert.Equal(data.Length, actual.TotalCount);
+    }
+
+
+    private QueryableWithCriteria<Employee> Arrange(Employee[] data, bool? totalCount, out Employee[] expectedData)
+    {
         var dataQuery = EmployeeSetBuilder.Build().AsQueryable();
         var expectedDataQuery = data.Take(3).AsQueryable();
-        var expectedData = expectedDataQuery.ToArray();
-        var criteria = new QueryCriteria(Paging: new(TotalCount: true));
+        expectedData = expectedDataQuery.ToArray();
+        var criteria = new QueryCriteria(Paging: new(TotalCount: totalCount));
 
-        var totalCountCriteria = criteria.ForTotalCount();
-                
         var queryableWithCriteria = new QueryableWithCriteria<Employee>(
             Name: "Test",
             Toolkit: toolkit.Object,
-            InputQuery: dataQuery,
+            InputQuery: data.AsQueryable(),
             Criteria: criteria
         );
 
@@ -66,14 +87,16 @@ public class QueryExecutor_ToResult
             .Setup(_ => _.ApplyCriteria(queryableWithCriteria.InputQuery, criteria))
             .Returns(expectedDataQuery);
 
-        toolkit.Handler
-            .Setup(_ => _.ApplyCriteria(queryableWithCriteria.InputQuery, totalCountCriteria))
-            .Returns(dataQuery);
+        if (totalCount == true)
+        {
+            var totalCountCriteria = criteria.ForTotalCount();
+            toolkit.Handler
+                .Setup(_ => _.ApplyCriteria(queryableWithCriteria.InputQuery, totalCountCriteria))
+                .Returns(dataQuery);
+        }
 
-        var actual = sut.ToResult(queryableWithCriteria);
 
-        Assert.Equal(expectedData, actual.Items);
-        Assert.Equal(data.Length, actual.TotalCount);
+        return queryableWithCriteria;
     }
 
     public class TestQueryExecutor : QueryExecutor
@@ -88,7 +111,7 @@ public class QueryExecutor_ToResult
         protected override T[] ToArray<T>(IQueryable<T> query)
             => query.ToArray();
 
-        protected override Task<T[]> ToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default)           
+        protected override Task<T[]> ToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default)
              => Task.FromResult(query.ToArray());
     }
 
