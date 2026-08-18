@@ -12,6 +12,7 @@
 
 # Tests
 - [x] Refactor everywhere with Moq dependencies
+- [x] Best code coverage
 
 # Clean code
 - [x] Remove all unnecessary usings
@@ -19,27 +20,8 @@
 # AspNetCore support
 - [x] Use AsParameters attribute to bind QueryString to QueryCriteriaParameters
 
-
-# Code Coverage
-
-- [ ] QueryCriteriaHandler.ApplyFilterCriteria
-- [ ] QueryCriteriaHandler.ApplyOrderByCriteria
-- [ ] QueryExecutor.*
-- [ ] DefaultQueryExecutor.*
-- [ ] QueryableWithCriteriaExtensions.WithPaging
-- [ ] QueryableWithCriteriaExtensions.RequiresTotalCount
-- [ ] QueryableWithCriteriaExtensions.ForTotalCount
-- [ ] QueryableWithCriteriaExtensions.ToResult
-- [ ] ExpressionBuilder.CreatePropertyOrFieldExpressionFromPath
-- [ ] ExpressionBuilder.CreatePropertyOrFieldExpressionFromPath
-- [ ] ExpressionBuilder.ValidateValueTypeOrThrow
-- [ ] ExpressionBuilder.ValidateOperatorOrThrow
-- [ ] ExpressionBuilder.CreateOperatorExpression
-- [ ] ExpressionBuilder.GetValueFromExpression
-- [ ] ExpressionBuilder.GetStringMethodInfo
-- [ ] ExpressionBuilder.ReplaceParameterVisitor
-
 # Comments
+- [ ] Add comments for public interfaces, classes, methods, props
 
 # README.md
 
