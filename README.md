@@ -198,34 +198,63 @@ builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
 builder.Services.AddScoped<EmployeesService>();
 
 app.MapGet("/employees", async (
-	[AsParameters] QueryCriteriaParams queryCriteria,
+	[AsParameters] QueryCriteriaParams queryCriteriaParams,
 	EmployeesService service) =>
 {
-	var result = await service.GetAsync(queryCriteria);
-	return Results.Ok(result);
+    var queryCriteria = queryToolkit.Parser.Parse(queryCriteriaParams);
+
+    var result = await ctx.Employees
+        .Include(_ => _.Department) // use dto mapping/projection for real projects
+        .WithCriteria("Get employees", queryCriteria, queryToolkit)
+        .ToResultAsync();
+
+    return Results.Ok(result);
 });
-
-internal class EmployeesService(
-	CompanyDbContext context,
-	IQueryToolkit queryToolkit)
-{
-	internal async Task<QueryCriteriaResult<Employee>> GetAsync(
-		QueryCriteriaParams queryCriteriaParameters)
-	{
-		var criteria = queryToolkit.Parser.Parse(queryCriteriaParameters);
-
-		return await context.Employees
-			.Include(employee => employee.Department)
-			.WithCriteria("Get employees", criteria, queryToolkit)
-			.ToResultAsync();
-	}
-}
 ```
 
 For example, the following request applies a filter, ordering, paging, and a total count:
 
 ```http
 GET /employees?$filter=IsActive%20eq%20true&$orderby=HireDate%20desc&$skip=0&$top=10&$count=true
+```
+
+### 7. ASP.NET Core MVC with Entity Framework Core
+
+In an ASP.NET Core MVC controller, bind `QueryCriteriaParams` from the query string, parse the criteria through the injected `IQueryToolkit`, and execute the query with the EF Core executor:
+
+```csharp
+builder.Services.AddDbContext<CompanyDbContext>();
+builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
+builder.Services.AddControllers();
+
+app.MapControllers();
+
+[ApiController]
+[Route("employees")]
+public class EmployeesController(
+	CompanyDbContext context,
+	IQueryToolkit queryToolkit) : ControllerBase
+{
+	[HttpGet]
+	public async Task<ActionResult<QueryCriteriaResult<Employee>>> Get(
+		[FromQuery] QueryCriteriaParams queryCriteriaParams)
+	{
+		var queryCriteria = queryToolkit.Parser.Parse(queryCriteriaParams);
+
+		var result = await context.Employees
+			.Include(employee => employee.Department) // use dto mapping/projection for real projects
+			.WithCriteria("Get employees", queryCriteria, queryToolkit)
+			.ToResultAsync();
+
+		return Ok(result);
+	}
+}
+```
+
+For example, the following request can be handled by the controller:
+
+```http
+GET /employees?filter=IsActive%20eq%20true&orderby=HireDate%20desc&skip=0&top=10&count=true
 ```
 
 The following examples assume an `IQueryable<Employee>` named `employees` and a configured `IQueryToolkit` named `queryToolkit`.

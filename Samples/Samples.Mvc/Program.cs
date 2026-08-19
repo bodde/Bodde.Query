@@ -1,10 +1,12 @@
-using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Abstractions.Services;
+using Samples.Common.EFCore;
 using Bodde.Query.Core;
 using Bodde.Query.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using Samples.Common.EFCore;
+using Microsoft.AspNetCore.Mvc;
+using Bodde.Query.Abstractions.Services;
+using Bodde.Query.Abstractions.Models;
+using Samples.Common;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,39 +16,13 @@ builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<InitializeDatabaseService>();
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 MapOpenApi(app);
 
-app.MapGet("/employees", async (    
-    [AsParameters]QueryCriteriaParams queryCriteriaParams,
-    CompanyDbContext ctx,
-    IQueryToolkit queryToolkit
-    ) => 
-    {
-        try
-        {       
-            var queryCriteria = queryToolkit.Parser.Parse(queryCriteriaParams);
-
-            var result = await ctx.Employees
-                .Include(_ => _.Department) // use dto mapping/projection for real projects
-                .WithCriteria("Get employees", queryCriteria, queryToolkit)
-                .ToResultAsync();
-
-            return Results.Ok(result);
-        }
-        catch(FormatException formatEx)
-        {
-            // query parsing gone wrong
-            return Results.BadRequest(formatEx.Message);
-        }
-        catch(Exception ex)
-        {
-            app.Logger.LogError(ex, ex.Message);
-            return Results.InternalServerError();
-        }
-    }
-    );
+app.MapControllers();
 
 app.Run();
 
@@ -59,12 +35,13 @@ static void MapOpenApi(WebApplication app)
             .WithClassicLayout()
             .HideSearch()
             .HideSidebar()
+            .HideModels()
             .ExpandAllModelSections()
         );
 
         // redirect home to scalar
         app
-            .MapGet("/", () => Results.Redirect("/scalar/#tag/samplesminimalapi/GET/employees"))
+            .MapGet("/", () => Results.Redirect("scalar/#tag/employees"))
             .ExcludeFromDescription();
     }
 }
@@ -84,4 +61,26 @@ internal class InitializeDatabaseService(
 
         await ctx.EnsureRecreatedAsync(stoppingToken);
     }
+}
+
+
+[ApiController]
+[Route("employees")]
+public class EmployeesController(
+	CompanyDbContext context,
+	IQueryToolkit queryToolkit) : ControllerBase
+{
+	[HttpGet]
+	public async Task<ActionResult<QueryCriteriaResult<Employee>>> Get(
+		[FromQuery] QueryCriteriaParams queryCriteriaParams)
+	{
+		var queryCriteria = queryToolkit.Parser.Parse(queryCriteriaParams);
+
+		var result = await context.Employees
+			.Include(employee => employee.Department) // use dto mapping/projection for real projects
+			.WithCriteria("Get employees", queryCriteria, queryToolkit)
+			.ToResultAsync();
+
+		return Ok(result);
+	}
 }

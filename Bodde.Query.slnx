@@ -11,5 +11,6 @@
     <Project Path="Samples/Samples.ConsoleApp.EFCore/Samples.ConsoleApp.EFCore.csproj" />
     <Project Path="Samples/Samples.ConsoleApp.EFCore.DI/Samples.ConsoleApp.EFCore.DI.csproj" />
     <Project Path="Samples/Samples.MinimalApi/Samples.MinimalApi.csproj" />
+    <Project Path="Samples/Samples.Mvc/Samples.Mvc.csproj" />
   </Folder>
 </Solution>
