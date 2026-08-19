@@ -5,12 +5,12 @@
   <Project Path="Bodde.Query.Test/Bodde.Query.Test.csproj" />
   <Folder Name="/Samples/">
     <Project Path="Samples/Samples.ConsoleApp/Samples.ConsoleApp.csproj" />
+    <Project Path="Samples/Samples.AspNetCore.MinimalApi/Samples.AspNetCore.MinimalApi.csproj" />
+    <Project Path="Samples/Samples.AspNetCore.Mvc/Samples.AspNetCore.Mvc.csproj" />
     <Project Path="Samples/Samples.Common.EFCore/Samples.Common.EFCore.csproj" />
     <Project Path="Samples/Samples.Common/Samples.Common.csproj" />
     <Project Path="Samples/Samples.ConsoleApp.DI/Samples.ConsoleApp.DI.csproj" />
     <Project Path="Samples/Samples.ConsoleApp.EFCore/Samples.ConsoleApp.EFCore.csproj" />
     <Project Path="Samples/Samples.ConsoleApp.EFCore.DI/Samples.ConsoleApp.EFCore.DI.csproj" />
-    <Project Path="Samples/Samples.MinimalApi/Samples.MinimalApi.csproj" />
-    <Project Path="Samples/Samples.Mvc/Samples.Mvc.csproj" />
   </Folder>
 </Solution>

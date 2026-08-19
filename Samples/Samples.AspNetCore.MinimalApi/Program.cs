@@ -59,12 +59,12 @@ static void MapOpenApi(WebApplication app)
             .WithClassicLayout()
             .HideSearch()
             .HideSidebar()
-            .ExpandAllModelSections()
+            .HideModels()
         );
 
         // redirect home to scalar
         app
-            .MapGet("/", () => Results.Redirect("/scalar/#tag/samplesminimalapi/GET/employees"))
+            .MapGet("/", () => Results.Redirect("scalar"))
             .ExcludeFromDescription();
     }
 }
