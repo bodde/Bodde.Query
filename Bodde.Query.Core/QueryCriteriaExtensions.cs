@@ -1,7 +1,7 @@
 using Bodde.Query.Abstractions.Models;
 using static Bodde.Query.Abstractions.Models.FilterCriteria;
 
-namespace Bodde.Query.Abstractions.Extensions;
+namespace Bodde.Query.Core;
 
 /// <summary>
 /// Provides extension methods for composing query criteria.

@@ -1,6 +1,6 @@
 using Bodde.Query.Abstractions.Models;
 
-namespace Bodde.Query.Abstractions.Extensions;
+namespace Bodde.Query.Core;
 
 /// <summary>
 /// Provides extension methods for queries with criteria.

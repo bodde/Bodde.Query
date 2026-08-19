@@ -1,7 +1,6 @@
-using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
-
+using Bodde.Query.Core;
 using QueryComposer = System.Func<Bodde.Query.Abstractions.Models.QueryWithCriteria<Samples.Common.Employee>, Bodde.Query.Abstractions.Models.QueryWithCriteria<Samples.Common.Employee>>;
 
 namespace Samples.Common;
