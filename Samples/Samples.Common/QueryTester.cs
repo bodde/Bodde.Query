@@ -2,7 +2,7 @@ using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 
-using QueryComposer = System.Func<Bodde.Query.Abstractions.Models.QueryableWithCriteria<Samples.Common.Employee>, Bodde.Query.Abstractions.Models.QueryableWithCriteria<Samples.Common.Employee>>;
+using QueryComposer = System.Func<Bodde.Query.Abstractions.Models.QueryWithCriteria<Samples.Common.Employee>, Bodde.Query.Abstractions.Models.QueryWithCriteria<Samples.Common.Employee>>;
 
 namespace Samples.Common;
 
@@ -85,7 +85,7 @@ public class QueryTester(IEnumerable<Employee> employees, Action<string> outputM
         }
     }
 
-    private QueryableWithCriteria<Employee> CreateEmployeesWithCriteria()
+    private QueryWithCriteria<Employee> CreateEmployeesWithCriteria()
     {
         return employees
             .AsQueryable()

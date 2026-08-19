@@ -142,12 +142,12 @@ public class ServiceCollection_AddQueryServices
             throw new NotImplementedException();
         }
 
-        public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
+        public QueryCriteriaResult<T> ToResult<T>(QueryWithCriteria<T> query)
         {
             throw new NotImplementedException();
         }
 
-        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
+        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryWithCriteria<T> query, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -165,12 +165,7 @@ public class ServiceCollection_AddQueryServices
             throw new NotImplementedException();
         }
 
-        public ParameterExpression CreateParameterExpression<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Expression<Func<T, object>> CreatePropertyOrFieldExpressionFromPath<T>(string propertyPath, ParameterExpression? parameter = null)
+        public Expression<Func<T, object>> CreatePropertyOrFieldExpressionFromPath<T>(string propertyPath)
         {
             throw new NotImplementedException();
         }
@@ -206,7 +201,7 @@ public class ServiceCollection_AddQueryServices
             throw new NotImplementedException();
         }
 
-        public QueryCriteria Parse(QueryCriteriaParameters? queryCriteriaParameters)
+        public QueryCriteria Parse(QueryCriteriaParams? queryCriteriaParameters)
         {
             throw new NotImplementedException();
         }
@@ -254,12 +249,12 @@ public class ServiceCollection_AddQueryServices
             throw new NotImplementedException();
         }
 
-        public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
+        public QueryCriteriaResult<T> ToResult<T>(QueryWithCriteria<T> query)
         {
             throw new NotImplementedException();
         }
 
-        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
+        public Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryWithCriteria<T> query, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

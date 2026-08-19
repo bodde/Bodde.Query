@@ -6,12 +6,12 @@ using Bodde.Query.Test.Models;
 
 namespace Bodde.Query.Test;
 
-public class QueryableWithCriteriaExtensions_WithName
+public class QueryWithCriteriaExtensions_WithName
 {        
     private readonly QueryToolkitMock toolkit;
-    private readonly QueryableWithCriteria<Employee> sut;
+    private readonly QueryWithCriteria<Employee> sut;
 
-    public QueryableWithCriteriaExtensions_WithName()
+    public QueryWithCriteriaExtensions_WithName()
     {
         toolkit = new QueryToolkitMock();
         sut = EmployeeSetBuilder.Build().AsQueryable().WithCriteria(toolkit.Object);

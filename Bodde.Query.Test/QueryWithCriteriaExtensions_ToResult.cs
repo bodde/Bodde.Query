@@ -7,12 +7,12 @@ using Moq;
 
 namespace Bodde.Query.Test;
 
-public class QueryableWithCriteriaExtensions_ToResult
+public class QueryWithCriteriaExtensions_ToResult
 {
     private readonly QueryToolkitMock toolkit;
-    private readonly QueryableWithCriteria<Employee> sut;
+    private readonly QueryWithCriteria<Employee> sut;
 
-    public QueryableWithCriteriaExtensions_ToResult()
+    public QueryWithCriteriaExtensions_ToResult()
     {
         toolkit = new QueryToolkitMock();
         sut = EmployeeSetBuilder.Build().AsQueryable().WithCriteria(toolkit.Object);

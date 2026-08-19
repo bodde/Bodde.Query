@@ -14,7 +14,7 @@ public abstract class QueryExecutor : IQueryExecutor
 
     protected abstract Task<int> CountAsync<T>(IQueryable<T> query, CancellationToken ct = default);
 
-    public QueryCriteriaResult<T> ToResult<T>(QueryableWithCriteria<T> query)
+    public QueryCriteriaResult<T> ToResult<T>(QueryWithCriteria<T> query)
     {       
         var result = ToArray(query.OutputQuery);
         int? totalCount = query.RequiresTotalCount() ? Count(query.ForTotalCount().OutputQuery) : null;
@@ -23,7 +23,7 @@ public abstract class QueryExecutor : IQueryExecutor
         return new QueryCriteriaResult<T>(query.Name, criteria, result, totalCount);
     }
 
-    public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryableWithCriteria<T> query, CancellationToken cancellationToken = default)
+    public async Task<QueryCriteriaResult<T>> ToResultAsync<T>(QueryWithCriteria<T> query, CancellationToken cancellationToken = default)
     {        
         var result = await ToArrayAsync(query.OutputQuery, cancellationToken).ConfigureAwait(false);
         int? totalCount = query.RequiresTotalCount()

@@ -8,12 +8,12 @@ using static Bodde.Query.Abstractions.Models.FilterCriteria;
 
 namespace Bodde.Query.Test;
 
-public class QueryableWithCriteriaExtensions_WithFilter
+public class QueryWithCriteriaExtensions_WithFilter
 {
     private readonly QueryToolkitMock toolkit;
-    private readonly QueryableWithCriteria<Employee> sut;
+    private readonly QueryWithCriteria<Employee> sut;
 
-    public QueryableWithCriteriaExtensions_WithFilter()
+    public QueryWithCriteriaExtensions_WithFilter()
     {
         toolkit = new QueryToolkitMock();
         sut = EmployeeSetBuilder.Build().AsQueryable().WithCriteria(toolkit.Object);

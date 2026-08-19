@@ -6,7 +6,7 @@ using Moq;
 
 namespace Bodde.Query.Test;
 
-public class QueryableWithCriteria_ToString
+public class QueryWithCriteria_ToString
 {    
     [Fact]
     public void ToString_ReturnsExpectedString()
@@ -23,7 +23,7 @@ public class QueryableWithCriteria_ToString
             .Setup(_ => _.Format(It.Is<QueryCriteria>(_ => _ == queryCriteria)))
             .Returns(expectedFormattedString);
 
-        var sut = new QueryableWithCriteria<Employee>(
+        var sut = new QueryWithCriteria<Employee>(
             queryName,
             queryToolkit.Object,
             employees,
