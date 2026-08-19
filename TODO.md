@@ -25,9 +25,8 @@
 
 # README.md
 
-- [ ] Using library
-- [ ] Sequence and class diagrams
-- [ ] Extensibility
+- [x] Create full document
+
 
 # Nuget packages
 - [ ] Move ToDisplayTable extension to Bodde.Common.Extensions package
