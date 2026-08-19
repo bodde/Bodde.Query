@@ -24,9 +24,9 @@
 - [x] Add comments for public interfaces, classes, methods, props
 
 # README.md
-
 - [x] Create full document
 
+# Convert to .NET Standard 2.0 ?
 
 # Nuget packages
 - [ ] Move ToDisplayTable extension to Bodde.Common.Extensions package
