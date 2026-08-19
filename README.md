@@ -8,6 +8,34 @@ It supports a lightweight partial, limited subset of OData query constructs, inc
 
 The toolkit is extensible and includes integrations for Entity Framework Core.
 
+## Table of Contents
+
+- [Features](#features)
+- [Packages](#packages)
+- [Installation](#installation)
+- [Usage](#usage)
+	- [Getting the query toolkit](#getting-the-query-toolkit)
+	- [1. Execute a query without criteria](#1-execute-a-query-without-criteria)
+	- [1. Filter results](#1-filter-results)
+	- [2. Name a query](#2-name-a-query)
+	- [3. Filter and sort results](#3-filter-and-sort-results)
+	- [4. Apply paging and request the total count](#4-apply-paging-and-request-the-total-count)
+	- [5. Parse and execute a complete OData-style query asynchronously](#5-parse-and-execute-a-complete-odata-style-query-asynchronously)
+	- [6. Minimal API with Entity Framework Core](#6-minimal-api-with-entity-framework-core)
+	- [7. ASP.NET Core MVC with Entity Framework Core](#7-aspnet-core-mvc-with-entity-framework-core)
+	- [OData-style filters reference](#odata-style-filters-reference)
+	- [Minimal API with Entity Framework Core](#minimal-api-with-entity-framework-core)
+	- [ASP.NET Core MVC with Entity Framework Core](#aspnet-core-mvc-with-entity-framework-core)
+    - [Example projects with source code](#example-projects-with-source-code)
+- [Configuration](#configuration)
+	- [Default service registration](#default-service-registration)
+	- [Entity Framework Core](#entity-framework-core-1)
+	- [Custom implementations](#custom-implementations)
+- [Compatibility](#compatibility)
+- [Versioning](#versioning)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 - Lightweight, partial support for OData-style `$filter`, `$orderby`, `$top`, `$skip`, and `$count` query constructs.
@@ -342,6 +370,18 @@ var result = employees
 ### Limitations
 The filter parser has limited OData support, and each comparison must be binary. Use parentheses or multiple `WithFilter` calls when composing complex criteria.
 
+### Example projects with source code
+
+The repository includes sample projects demonstrating different usage scenarios:
+
+| Sample | Description |
+| --- | --- |
+| [Samples.ConsoleApp](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp) | Uses the toolkit directly without dependency injection. |
+| [Samples.ConsoleApp.DI](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.DI) | Uses the toolkit with dependency injection. |
+| [Samples.ConsoleApp.EFCore](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.EFCore) | Executes queries against Entity Framework Core. |
+| [Samples.ConsoleApp.EFCore.DI](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.EFCore.DI) | Combines Entity Framework Core with dependency injection. |
+| [Samples.AspNetCore.MinimalApi](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.AspNetCore.MinimalApi) | Exposes query criteria through an ASP.NET Core Minimal API. |
+| [Samples.AspNetCore.Mvc](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.AspNetCore.Mvc) | Exposes query criteria through an ASP.NET Mvc API. |
 
 ## Configuration
 
@@ -393,20 +433,6 @@ The default lifetime is `ServiceLifetime.Scoped` and can be changed when require
 builder.Services.AddQueryServices(options => options
 	.WithLifetime(ServiceLifetime.Singleton));
 ```
-
-## Examples
-
-The repository includes sample projects demonstrating different usage scenarios:
-
-| Sample | Description |
-| --- | --- |
-| [Samples.ConsoleApp](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp) | Uses the toolkit directly without dependency injection. |
-| [Samples.ConsoleApp.DI](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.DI) | Uses the toolkit with dependency injection. |
-| [Samples.ConsoleApp.EFCore](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.EFCore) | Executes queries against Entity Framework Core. |
-| [Samples.ConsoleApp.EFCore.DI](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.EFCore.DI) | Combines Entity Framework Core with dependency injection. |
-| [Samples.AspNetCore.MinimalApi](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.AspNetCore.MinimalApi) | Exposes query criteria through an ASP.NET Core Minimal API. |
-| [Samples.AspNetCore.Mvc](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.AspNetCore.Mvc) | Exposes query criteria through an ASP.NET Mvc API. |
-
 
 ## Compatibility
 
