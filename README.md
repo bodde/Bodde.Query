@@ -18,7 +18,18 @@ The toolkit is extensible and includes integrations for Entity Framework Core.
 
 ## Installation
 
-Install the package that matches your application requirements:
+### Abstraction
+
+This package contains the core models and service contracts used to define, parse, format, and execute query criteria.
+This package because it contains no business logic and has no dependencies and can be added safely to domain layers in Clean Architecture projects.
+
+```bash
+dotnet add package Bodde.Query.Abstractions
+```
+
+### Core
+
+This package povides the main query criteria implementation, including OData-inspired parsing and formatting, LINQ expression building, and dependency injection support.
 
 ```bash
 dotnet add package Bodde.Query.Core
@@ -38,11 +49,15 @@ If you don't use dependency injection, you can create and use the default toolki
 IQueryToolkit queryToolkit = QueryToolkit.Default();
 ```
 
-For Entity Framework Core support, install the additional integration package:
+### Entity Framework Core
+
+For Entity Framework Core support, install the following package:
 
 ```bash
 dotnet add package Bodde.Query.EntityFrameworkCore
 ```
+
+`Bodde.Query.EntityFrameworkCore` depends on `Bodde.Query.Core`, so installing it also provides the core package.
 
 When using Entity Framework Core, configure the EF Core query executor:
 
@@ -50,7 +65,23 @@ When using Entity Framework Core, configure the EF Core query executor:
 services.AddQueryServices(builder => builder.WithEntityFrameworkCore());
 ```
 
+If you don't use dependency injection, you can create and use the default toolkit directly with EF Core executor:
+
+```csharp
+IQueryToolkit queryToolkit = QueryToolkit.Default(executor: new EntityFrameworkCoreQueryExecutor());
+```
+
 ## Usage
+
+The repository includes sample projects demonstrating different usage scenarios:
+
+| Sample | Description |
+| --- | --- |
+| [Samples.ConsoleApp](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp) | Uses the toolkit directly without dependency injection. |
+| [Samples.ConsoleApp.DI](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.DI) | Uses the toolkit with dependency injection. |
+| [Samples.ConsoleApp.EFCore](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.EFCore) | Executes queries against Entity Framework Core. |
+| [Samples.ConsoleApp.EFCore.DI](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.ConsoleApp.EFCore.DI) | Combines Entity Framework Core with dependency injection. |
+| [Samples.MinimalApi](https://github.com/bodde/Bodde.Query/tree/main/Samples/Samples.MinimalApi) | Exposes query criteria through an ASP.NET Core Minimal API. |
 
 ### Getting the query toolkit
 
@@ -69,8 +100,6 @@ Without dependency injection, create the default implementation directly:
 ```csharp
 IQueryToolkit queryToolkit = QueryToolkit.Default();
 ```
-
-The following examples assume an `IQueryable<Employee>` named `employees` and a configured `IQueryToolkit` named `queryToolkit`.
 
 ### 1. Execute a query without criteria
 
@@ -159,7 +188,49 @@ Console.WriteLine($"Returned: {result.Items.Length}");
 
 Because `$count=true` is specified, executing this query asynchronously also runs a second internal query to calculate `TotalCount`.
 
-### Supported OData-style filters
+### 6. Minimal API with Entity Framework Core
+
+In a Minimal API, bind the supported query parameters with `QueryCriteriaParams`, parse them through the injected `IQueryToolkit`, and execute the query with the EF Core executor:
+
+```csharp
+builder.Services.AddDbContext<CompanyDbContext>();
+builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
+builder.Services.AddScoped<EmployeesService>();
+
+app.MapGet("/employees", async (
+	[AsParameters] QueryCriteriaParams queryCriteria,
+	EmployeesService service) =>
+{
+	var result = await service.GetAsync(queryCriteria);
+	return Results.Ok(result);
+});
+
+internal class EmployeesService(
+	CompanyDbContext context,
+	IQueryToolkit queryToolkit)
+{
+	internal async Task<QueryCriteriaResult<Employee>> GetAsync(
+		QueryCriteriaParams queryCriteriaParameters)
+	{
+		var criteria = queryToolkit.Parser.Parse(queryCriteriaParameters);
+
+		return await context.Employees
+			.Include(employee => employee.Department)
+			.WithCriteria("Get employees", criteria, queryToolkit)
+			.ToResultAsync();
+	}
+}
+```
+
+For example, the following request applies a filter, ordering, paging, and a total count:
+
+```http
+GET /employees?$filter=IsActive%20eq%20true&$orderby=HireDate%20desc&$skip=0&$top=10&$count=true
+```
+
+The following examples assume an `IQueryable<Employee>` named `employees` and a configured `IQueryToolkit` named `queryToolkit`.
+
+### OData-style filters reference
 
 Bodde.Query supports the following comparison operators:
 
@@ -185,7 +256,6 @@ var result = employees
 	.WithFilter("Salary gt 50000")
 	.ToResult();
 
-Console.WriteLine($"Returned: {result.Items.Length}");
 Console.WriteLine(result.Criteria); // "$filter=IsActive eq true and Salary gt 50000"
 ```
 
@@ -196,9 +266,6 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("IsActive eq true and Salary gt 50000")
 	.ToResult();
-
-Console.WriteLine($"Returned: {result.Items.Length}");
-Console.WriteLine(result.Criteria); // "$filter=IsActive eq true and Salary gt 50000"
 ```
 
 Use `or` to match at least one expression:
@@ -208,9 +275,6 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("Department.Name eq 'Sales' or Department.Name eq 'Engineering'")
 	.ToResult();
-
-Console.WriteLine($"Returned: {result.Items.Length}");
-Console.WriteLine(result.Criteria); // "$filter=Department.Name eq 'Sales' or Department.Name eq 'Engineering'"
 ```
 
 Use `not` to negate a comparison or a parenthesized expression:
@@ -220,9 +284,6 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("not (IsActive eq true)")
 	.ToResult();
-
-Console.WriteLine($"Returned: {result.Items.Length}");
-Console.WriteLine(result.Criteria); // "$filter=not (IsActive eq true)"
 ```
 
 Logical operators can be combined in nested expressions by using parentheses:
@@ -232,12 +293,10 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("(IsActive eq true and Salary gt 50000) or (Department.Name eq 'Sales' and HireDate ge 2021-01-01)")
 	.ToResult();
-
-Console.WriteLine($"Returned: {result.Items.Length}");
-Console.WriteLine(result.Criteria); // "$filter=IsActive eq true and Salary gt 50000 or Department.Name eq 'Sales' and HireDate ge 2021-01-01T00:00:00.0000000"
 ```
 
-The filter parser has limited OData support, and each comparison must be binary. Use parentheses and multiple `WithFilter` calls when composing complex criteria.
+### Limitations
+The filter parser has limited OData support, and each comparison must be binary. Use parentheses or multiple `WithFilter` calls when composing complex criteria.
 
 
 ## Configuration
