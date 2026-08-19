@@ -21,7 +21,7 @@
 - [x] Use AsParameters attribute to bind QueryString to QueryCriteriaParameters
 
 # Comments
-- [ ] Add comments for public interfaces, classes, methods, props
+- [x] Add comments for public interfaces, classes, methods, props
 
 # README.md
 
