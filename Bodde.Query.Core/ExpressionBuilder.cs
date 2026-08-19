@@ -23,14 +23,9 @@ internal class ExpressionBuilder : IExpressionBuilder
         };
     }
 
-    public ParameterExpression CreateParameterExpression<T>()
+    public Expression<Func<T, object>> CreatePropertyOrFieldExpressionFromPath<T>(string propertyPath)
     {
-        return Expression.Parameter(typeof(T));
-    }
-
-    public Expression<Func<T, object>> CreatePropertyOrFieldExpressionFromPath<T>(string propertyPath, ParameterExpression? parameter = null)
-    {
-        parameter ??= CreateParameterExpression<T>();
+        var parameter = CreateParameterExpression<T>();
 
         var propertyPathExpression = CreatePropertyOrFieldExpressionFromPath(propertyPath, parameter);
         var converted = Expression.Convert(propertyPathExpression, typeof(object));
@@ -38,6 +33,8 @@ internal class ExpressionBuilder : IExpressionBuilder
 
         return expression;
     }
+
+    private static ParameterExpression CreateParameterExpression<T>() => Expression.Parameter(typeof(T));
 
     private Expression<Func<T, bool>> CreateLogicalExpression<T>(
         FilterCriteria.LogicalExpression logicalExpression,

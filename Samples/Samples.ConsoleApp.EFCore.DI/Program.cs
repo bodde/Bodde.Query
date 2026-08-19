@@ -1,7 +1,6 @@
 ﻿using Bodde.Query.Core;
 using Bodde.Query.EntityFrameworkCore;
 using Samples.Common;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;

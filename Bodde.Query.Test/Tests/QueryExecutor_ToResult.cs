@@ -1,5 +1,4 @@
 using Bodde.Query.Abstractions.Models;
-using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Core;
 using Bodde.Query.Test.Helpers;
 using Bodde.Query.Test.Mocked;
@@ -68,14 +67,14 @@ public class QueryExecutor_ToResult
     }
 
 
-    private QueryableWithCriteria<Employee> Arrange(Employee[] data, bool? totalCount, out Employee[] expectedData)
+    private QueryWithCriteria<Employee> Arrange(Employee[] data, bool? totalCount, out Employee[] expectedData)
     {
         var dataQuery = EmployeeSetBuilder.Build().AsQueryable();
         var expectedDataQuery = data.Take(3).AsQueryable();
         expectedData = expectedDataQuery.ToArray();
         var criteria = new QueryCriteria(Paging: new(TotalCount: totalCount));
 
-        var queryableWithCriteria = new QueryableWithCriteria<Employee>(
+        var queryableWithCriteria = new QueryWithCriteria<Employee>(
             Name: "Test",
             Toolkit: toolkit.Object,
             InputQuery: data.AsQueryable(),

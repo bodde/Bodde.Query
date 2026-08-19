@@ -1,5 +1,4 @@
 using System.Text;
-using Bodde.Query.Abstractions.Extensions;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Core;
@@ -36,7 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/employees", async (    
-    [AsParameters]QueryCriteriaParameters queryCriteria,
+    [AsParameters]QueryCriteriaParams queryCriteria,
     EmployeesService service
     ) => 
     {
@@ -66,7 +65,7 @@ internal class EmployeesService(
     ILogger<EmployeesService> logger
     )
 {
-    internal async Task<QueryCriteriaResult<Employee>> GetAsync(QueryCriteriaParameters queryCriteriaParameters)
+    internal async Task<QueryCriteriaResult<Employee>> GetAsync(QueryCriteriaParams queryCriteriaParameters)
     {
         Log(queryCriteriaParameters);
 
@@ -79,7 +78,7 @@ internal class EmployeesService(
         return result;
     }
 
-    private void Log(QueryCriteriaParameters queryCriteriaParameters)
+    private void Log(QueryCriteriaParams queryCriteriaParameters)
     {
         var nd = "<nd>";
         var filter = queryCriteriaParameters.Filter ?? nd;

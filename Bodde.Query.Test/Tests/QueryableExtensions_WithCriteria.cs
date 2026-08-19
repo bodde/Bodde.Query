@@ -1,4 +1,4 @@
-using Bodde.Query.Abstractions.Extensions;
+using Bodde.Query.Core;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Test.Helpers;
@@ -26,7 +26,7 @@ public class QueryableExtensions_WithCriteria
         var sut = employees.WithCriteria(queryToolkit.Object);
 
         Assert.NotNull(sut);
-        Assert.IsType<QueryableWithCriteria<Employee>>(sut);
+        Assert.IsType<QueryWithCriteria<Employee>>(sut);
         Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Empty(sut.Name);
         Assert.Equal(emptyCriteria, sut.Criteria);
@@ -44,7 +44,7 @@ public class QueryableExtensions_WithCriteria
         var sut = employees.WithCriteria(customName,queryToolkit.Object);
 
         Assert.NotNull(sut);
-        Assert.IsType<QueryableWithCriteria<Employee>>(sut);
+        Assert.IsType<QueryWithCriteria<Employee>>(sut);
         Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Equal(customName, sut.Name);
         Assert.Equal(emptyCriteria, sut.Criteria);
@@ -62,7 +62,7 @@ public class QueryableExtensions_WithCriteria
         var sut = employees.WithCriteria(customCriteria, queryToolkit.Object);
 
         Assert.NotNull(sut);
-        Assert.IsType<QueryableWithCriteria<Employee>>(sut);
+        Assert.IsType<QueryWithCriteria<Employee>>(sut);
         Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Empty(sut.Name);
         Assert.Equal(customCriteria, sut.Criteria);
@@ -81,7 +81,7 @@ public class QueryableExtensions_WithCriteria
         var sut = employees.WithCriteria(customName, customCriteria, queryToolkit.Object);
 
         Assert.NotNull(sut);
-        Assert.IsType<QueryableWithCriteria<Employee>>(sut);
+        Assert.IsType<QueryWithCriteria<Employee>>(sut);
         Assert.Equal(queryToolkit.Object, sut.Toolkit);
         Assert.Equal(customName, sut.Name);
         Assert.Equal(customCriteria, sut.Criteria);

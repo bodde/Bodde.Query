@@ -1,19 +1,18 @@
-using Bodde.Query.Abstractions.Extensions;
+using Bodde.Query.Core;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Test.Helpers;
 using Bodde.Query.Test.Mocked;
 using Bodde.Query.Test.Models;
 using Moq;
-using static Bodde.Query.Abstractions.Models.OrderByCriteria;
 
 namespace Bodde.Query.Test;
 
-public class QueryableWithCriteriaExtensions_ForTotalCount
+public class QueryWithCriteriaExtensions_ForTotalCount
 {
     private readonly QueryToolkitMock toolkit;
-    private readonly QueryableWithCriteria<Employee> sut;
+    private readonly QueryWithCriteria<Employee> sut;
 
-    public QueryableWithCriteriaExtensions_ForTotalCount()
+    public QueryWithCriteriaExtensions_ForTotalCount()
     {
         toolkit = new QueryToolkitMock();
         sut = EmployeeSetBuilder.Build().AsQueryable().WithCriteria(toolkit.Object);

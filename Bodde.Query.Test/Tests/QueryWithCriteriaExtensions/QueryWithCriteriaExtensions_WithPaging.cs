@@ -1,4 +1,4 @@
-using Bodde.Query.Abstractions.Extensions;
+using Bodde.Query.Core;
 using Bodde.Query.Abstractions.Models;
 using Bodde.Query.Test.Helpers;
 using Bodde.Query.Test.Mocked;
@@ -6,12 +6,12 @@ using Bodde.Query.Test.Models;
 
 namespace Bodde.Query.Test;
 
-public class QueryableWithCriteriaExtensions_WithPaging
+public class QueryWithCriteriaExtensions_WithPaging
 {
     private readonly QueryToolkitMock toolkit;
-    private readonly QueryableWithCriteria<Employee> sut;
+    private readonly QueryWithCriteria<Employee> sut;
 
-    public QueryableWithCriteriaExtensions_WithPaging()
+    public QueryWithCriteriaExtensions_WithPaging()
     {
         toolkit = new QueryToolkitMock();
         sut = EmployeeSetBuilder.Build().AsQueryable().WithCriteria(toolkit.Object);

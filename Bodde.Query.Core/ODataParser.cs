@@ -27,7 +27,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     public QueryCriteria Parse(string? filter = null, string? orderBy = null, int? skip = null, int? top = null, bool? totalCount = null)
     {
-        return Parse(new QueryCriteriaParameters
+        return Parse(new QueryCriteriaParams
         {
             Filter = filter,
             OrderBy = orderBy,
@@ -37,7 +37,7 @@ internal partial class ODataParser : IQueryCriteriaParser
         });
     }
 
-    public QueryCriteria Parse(QueryCriteriaParameters queryCriteriaParameters)
+    public QueryCriteria Parse(QueryCriteriaParams queryCriteriaParameters)
     {
         ArgumentNullException.ThrowIfNull(queryCriteriaParameters, nameof(queryCriteriaParameters));
 
