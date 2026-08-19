@@ -12,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<CompanyDbContext>();
 builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
-builder.Services.AddScoped<EmployeesService>();
 
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<InitializeDatabaseService>();
@@ -35,13 +34,20 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/employees", async (    
-    [AsParameters]QueryCriteriaParams queryCriteria,
-    EmployeesService service
+    [AsParameters]QueryCriteriaParams queryCriteriaParams,
+    CompanyDbContext ctx,
+    IQueryToolkit queryToolkit
     ) => 
     {
         try
         {       
-            var result = await service.GetAsync(queryCriteria);
+            var queryCriteria = queryToolkit.Parser.Parse(queryCriteriaParams);
+
+            var result = await ctx.Employees
+                .Include(_ => _.Department) // use dto mapping/projection for real projects
+                .WithCriteria("Get employees", queryCriteria, queryToolkit)
+                .ToResultAsync();
+
             return Results.Ok(result);
         }
         catch(FormatException formatEx)
@@ -58,47 +64,6 @@ app.MapGet("/employees", async (
     );
 
 app.Run();
-
-internal class EmployeesService(
-    CompanyDbContext ctx,
-    IQueryToolkit queryToolkit,
-    ILogger<EmployeesService> logger
-    )
-{
-    internal async Task<QueryCriteriaResult<Employee>> GetAsync(QueryCriteriaParams queryCriteriaParameters)
-    {
-        Log(queryCriteriaParameters);
-
-        var queryCriteria = queryToolkit.Parser.Parse(queryCriteriaParameters);
-
-        var result = await ctx.Employees
-            .Include(_ => _.Department) // use dto mapping/projection for real projects
-            .WithCriteria("Get employees", queryCriteria, queryToolkit).ToResultAsync();
-
-        return result;
-    }
-
-    private void Log(QueryCriteriaParams queryCriteriaParameters)
-    {
-        var nd = "<nd>";
-        var filter = queryCriteriaParameters.Filter ?? nd;
-        var orderBy = queryCriteriaParameters.OrderBy ?? nd;
-        var skip = queryCriteriaParameters.Skip?.ToString() ?? nd;
-        var top = queryCriteriaParameters.Top.ToString() ?? nd;
-        var count = queryCriteriaParameters.Count ?? false;
-
-        var sb = new StringBuilder();
-
-        sb.AppendLine("\nGet Employees");
-        sb.AppendLine($"Filter:\t\t{filter}");
-        sb.AppendLine($"OrderBy:\t{orderBy}");
-        sb.AppendLine($"Skip:\t\t{skip}");
-        sb.AppendLine($"Top:\t\t{top}");
-        sb.AppendLine($"Count:\t\t{count}");
-
-        logger.LogInformation(sb.ToString());
-    }
-}
 
 internal class InitializeDatabaseService(
     IServiceScopeFactory serviceScopeFactory, 
