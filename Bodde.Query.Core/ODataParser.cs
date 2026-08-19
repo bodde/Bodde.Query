@@ -347,8 +347,7 @@ internal partial class ODataParser : IQueryCriteriaParser
         if (comparisonOperator == FilterCriteria.ComparisonOperator.In)
         {
             // handle 'in' operator with multiple values in parentheses
-            var inValuesRegex = new Regex(@"\((.*)\)");
-            var match = inValuesRegex.Match(valueString);
+            var match = InValuesRegex().Match(valueString);
             if (!match.Success)
             {
                 throw new FormatException("Invalid syntax for 'in' operator.");
@@ -387,10 +386,10 @@ internal partial class ODataParser : IQueryCriteriaParser
             return (null!, typeof(object));
         }
 
-        var quotesRegEx = QuotesRegex();
-        if (quotesRegEx.IsMatch(valueString))
+        var quotesRegex = QuotesRegex();
+        if (quotesRegex.IsMatch(valueString))
         {
-            return (quotesRegEx.Replace(valueString, "$1"), typeof(string));
+            return (quotesRegex.Replace(valueString, "$1"), typeof(string));
         }
 
         if (int.TryParse(valueString, out var intValue))
@@ -463,7 +462,6 @@ internal partial class ODataParser : IQueryCriteriaParser
     [GeneratedRegex(@"(\|\d+\|)")]
     private static partial Regex ExpressionKeysRegex();
 
-
     [GeneratedRegex(@"\$skip=(\d+)", RegexOptions.IgnoreCase)]
     private static partial Regex SkipRegex();
 
@@ -472,4 +470,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     [GeneratedRegex(@"\$count=(true|false)", RegexOptions.IgnoreCase)]
     private static partial Regex CountRegex();
+
+    [GeneratedRegex(@"\((.*)\)")]
+    private static partial Regex InValuesRegex();
 }
