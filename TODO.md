@@ -29,4 +29,26 @@
 - [ ] Sequence and class diagrams
 - [ ] Extensibility
 
+# Nuget packages
+- [ ] Move ToDisplayTable extension to Bodde.Common.Extensions package
+- [ ] Abstractions
+  - [ ] Configure NuGet package
+  - [ ] Ensure that README.md is taken from root
+  - [ ] Create GitHub Action
+  - [ ] Create Tag/Release
+  - [ ] Publish
+- [ ] Core
+  - [ ] Configure NuGet package
+  - [ ] Ensure that Abstraction dependency comes from NuGet package
+  - [ ] Ensure that README.md is taken from root
+  - [ ] Create GitHub Action
+  - [ ] Create Tag/Release
+  - [ ] Publish
+- [ ] EntityFrameworkCore
+  - [ ] Configure NuGet package
+  - [ ] Ensure that Abstraction anc Core dependencies come from NuGet package
+  - [ ] Ensure that README.md is taken from root
+  - [ ] Create GitHub Action
+  - [ ] Create Tag/Release
+  - [ ] Publish
 
