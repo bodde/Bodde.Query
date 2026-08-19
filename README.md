@@ -1,26 +1,20 @@
 # Bodde.Query
 
-Bodde.Query is a lightweight set of NuGet packages for building, parsing, formatting, and executing query criteria.
+Bodde.Query is a set of NuGet packages for building, parsing, formatting, and executing query criteria.
 
 It provides reusable support for filtering, sorting, and paging `IQueryable<T>` data sources.
 
-It supports a partial, limited subset of OData query constructs, including `$filter`, `$orderby`, `$top`, `$skip`, and `$count`. These constructs can describe queries without requiring a dependency on `Microsoft.OData` or the generation of EDM models.
+It supports a lightweight partial, limited subset of OData query constructs, including `$filter`, `$orderby`, `$top`, `$skip`, and `$count`. These constructs can describe queries without requiring a dependency on `Microsoft.OData` or the needing EDM models generation.
 
 The toolkit is extensible and includes integrations for Entity Framework Core.
 
 ## Packages
 
-### Bodde.Query.Abstractions
-
-Contains the core models and service contracts used to define, parse, format, and execute query criteria.
-
-### Bodde.Query.Core
-
-Provides the main query criteria implementation, including OData-inspired parsing and formatting, LINQ expression building, and dependency injection support.
-
-### Bodde.Query.EntityFrameworkCore
-
-Adds Entity Framework Core integration for executing query criteria against EF Core data sources.
+| Package | Description |
+| --- | --- |
+| `Bodde.Query.Abstractions` | Contains the core models and service contracts used to define, parse, format, and execute query criteria. |
+| `Bodde.Query.Core` | Provides the main query criteria implementation, including OData-inspired parsing and formatting, LINQ expression building, and dependency injection support. |
+| `Bodde.Query.EntityFrameworkCore` | Adds Entity Framework Core integration for executing query criteria against EF Core data sources. |
 
 ## Installation
 
@@ -84,6 +78,9 @@ The following examples assume an `IQueryable<Employee>` named `employees` and a 
 var result = employees
 	.WithCriteria(queryToolkit)
 	.ToResult();
+
+Console.WriteLine($"Returned: {result.Items.Length}");
+Console.WriteLine(result.Criteria); // ""
 ```
 
 `WithCriteria` returns a `QueryWithCriteria<T>` instance, which wraps the source query and the selected toolkit. This type enables the other query extension methods, such as `WithName`, `WithFilter`, `WithOrderBy`, and `WithPaging`, to be chained before execution.
@@ -95,6 +92,9 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("IsActive eq true")
 	.ToResult();
+
+Console.WriteLine(result.Criteria); // "$filter=IsActive eq true"
+Console.WriteLine($"Returned: {result.Items.Length}");
 ```
 
 ### 2. Name a query
@@ -109,6 +109,8 @@ var result = employees
 	.ToResult();
 
 Console.WriteLine(result.Name); // Active employees
+Console.WriteLine(result.Criteria); // "$filter=IsActive eq true"
+Console.WriteLine($"Returned: {result.Items.Length}");
 ```
 
 ### 3. Filter and sort results
@@ -119,6 +121,9 @@ var result = employees
 	.WithFilter("IsActive eq true")
 	.WithOrderBy("HireDate desc")
 	.ToResult();
+
+Console.WriteLine(result.Criteria); // "$filter=IsActive eq true&$orderby=HireDate desc"
+Console.WriteLine($"Returned: {result.Items.Length}");
 ```
 
 ### 4. Apply paging and request the total count
@@ -131,6 +136,7 @@ var result = employees
 	.WithPaging(skip: 20, top: 10, totalCount: true)
 	.ToResult();
 
+Console.WriteLine(result.Criteria); // "$skip=20&$top=10&$count=true&$filter=Department.Name eq 'Engineering'&$orderby=Name asc"
 Console.WriteLine($"Returned: {result.Items.Length}");
 Console.WriteLine($"Total: {result.TotalCount}");
 ```
@@ -146,6 +152,9 @@ var criteria = queryToolkit.Parser.Parse(
 var result = await employees
 	.WithCriteria(criteria, queryToolkit)
 	.ToResultAsync();
+
+Console.WriteLine(result.Criteria); // "$skip=20&$top=10&$count=true&$filter=IsActive eq true&$orderby=HireDate desc"
+Console.WriteLine($"Returned: {result.Items.Length}");
 ```
 
 Because `$count=true` is specified, executing this query asynchronously also runs a second internal query to calculate `TotalCount`.
@@ -175,6 +184,9 @@ var result = employees
 	.WithFilter("IsActive eq true")
 	.WithFilter("Salary gt 50000")
 	.ToResult();
+
+Console.WriteLine($"Returned: {result.Items.Length}");
+Console.WriteLine(result.Criteria); // "$filter=IsActive eq true and Salary gt 50000"
 ```
 
 Use `and` to require all expressions to match:
@@ -184,6 +196,9 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("IsActive eq true and Salary gt 50000")
 	.ToResult();
+
+Console.WriteLine($"Returned: {result.Items.Length}");
+Console.WriteLine(result.Criteria); // "$filter=IsActive eq true and Salary gt 50000"
 ```
 
 Use `or` to match at least one expression:
@@ -193,6 +208,9 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("Department.Name eq 'Sales' or Department.Name eq 'Engineering'")
 	.ToResult();
+
+Console.WriteLine($"Returned: {result.Items.Length}");
+Console.WriteLine(result.Criteria); // "$filter=Department.Name eq 'Sales' or Department.Name eq 'Engineering'"
 ```
 
 Use `not` to negate a comparison or a parenthesized expression:
@@ -202,6 +220,9 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("not (IsActive eq true)")
 	.ToResult();
+
+Console.WriteLine($"Returned: {result.Items.Length}");
+Console.WriteLine(result.Criteria); // "$filter=not (IsActive eq true)"
 ```
 
 Logical operators can be combined in nested expressions by using parentheses:
@@ -211,6 +232,9 @@ var result = employees
 	.WithCriteria(queryToolkit)
 	.WithFilter("(IsActive eq true and Salary gt 50000) or (Department.Name eq 'Sales' and HireDate ge 2021-01-01)")
 	.ToResult();
+
+Console.WriteLine($"Returned: {result.Items.Length}");
+Console.WriteLine(result.Criteria); // "$filter=IsActive eq true and Salary gt 50000 or Department.Name eq 'Sales' and HireDate ge 2021-01-01T00:00:00.0000000"
 ```
 
 The filter parser has limited OData support, and each comparison must be binary. Use parentheses and multiple `WithFilter` calls when composing complex criteria.
