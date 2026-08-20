@@ -10,7 +10,8 @@ internal class ExpressionBuilder : IExpressionBuilder
 {
     public Expression<Func<T, bool>> CreateFilterExpression<T>(FilterCriteria.FilterExpression filterExpression)
     {
-        ArgumentNullException.ThrowIfNull(filterExpression);
+        if (filterExpression == null)
+            throw new ArgumentNullException(nameof(filterExpression));
 
         var parameter = CreateParameterExpression<T>();
 

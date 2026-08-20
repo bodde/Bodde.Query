@@ -26,7 +26,14 @@
 # README.md
 - [x] Create full document
 
-# Convert to .NET Standard 2.0 ?
+# Make the libraries compatible with most versions of .NET
+- [x] Convert to .NET Standard 2.0: Bodde.Query.Abstractions
+- [x] Convert to .NET Standard 2.0: Bodde.Query.Core
+- [x] Add .NET 8 compatibility to Bodde.Query.EntityFrameworkCore
+
+# Move common extension methods to Bodde.Common.Extension
+- [ ] Tokenize
+- [ ] ToDisplayTable -> FormatAsTable
 
 # Nuget packages
 - [ ] Move ToDisplayTable extension to Bodde.Common.Extensions package
