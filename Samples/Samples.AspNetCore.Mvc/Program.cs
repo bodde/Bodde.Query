@@ -1,7 +1,6 @@
 using Samples.Common.EFCore;
 using Bodde.Query.Core;
 using Bodde.Query.EntityFrameworkCore;
-using Scalar.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Bodde.Query.Abstractions.Services;
 using Bodde.Query.Abstractions.Models;
@@ -13,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CompanyDbContext>();
 builder.Services.AddQueryServices(_ => _.WithEntityFrameworkCore());
 
-builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<InitializeDatabaseService>();
 
 builder.Services.AddControllers();
@@ -30,18 +29,12 @@ static void MapOpenApi(WebApplication app)
 {
     if (app.Environment.IsDevelopment())
     {
-        app.MapOpenApi();
-        app.MapScalarApiReference(opt => opt
-            .WithClassicLayout()
-            .HideSearch()
-            .HideSidebar()
-            .HideModels()
-            .ExpandAllModelSections()
-        );
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
-        // redirect home to scalar
+        // redirect home to Swagger UI
         app
-            .MapGet("/", () => Results.Redirect("scalar/#tag/employees"))
+            .MapGet("/", () => Results.Redirect("swagger"))
             .ExcludeFromDescription();
     }
 }
