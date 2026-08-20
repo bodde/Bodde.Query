@@ -6,7 +6,7 @@ using Bodde.Query.Abstractions.Services;
 
 namespace Bodde.Query.Core;
 
-internal partial class ODataParser : IQueryCriteriaParser
+internal class ODataParser : IQueryCriteriaParser
 {
     public QueryCriteria Parse(string criteriaString)
     {
@@ -15,7 +15,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
         var paging = ParsePaging(criteriaString);
 
-        var parts = criteriaString.Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var parts = criteriaString.Tokenize('&');
 
         var filterCriteriaString = parts.FirstOrDefault(_ => _.StartsWith("$filter=", StringComparison.OrdinalIgnoreCase));
         var filter = filterCriteriaString != null ? ParseFilter(filterCriteriaString) : null;
@@ -65,9 +65,9 @@ internal partial class ODataParser : IQueryCriteriaParser
         if (pagingString == null)
             throw new ArgumentNullException(nameof(pagingString));
 
-        var skipValue = SkipRegex().Match(pagingString).Groups[1].Value;
-        var topValue = TopRegex().Match(pagingString).Groups[1].Value;
-        var countValue = CountRegex().Match(pagingString).Groups[1].Value;
+        var skipValue = SkipRegex.Match(pagingString).Groups[1].Value;
+        var topValue = TopRegex.Match(pagingString).Groups[1].Value;
+        var countValue = CountRegex.Match(pagingString).Groups[1].Value;
 
         return new PagingCriteria(
             Skip: string.IsNullOrEmpty(skipValue) ? null : int.Parse(skipValue),
@@ -81,9 +81,10 @@ internal partial class ODataParser : IQueryCriteriaParser
         if (filterString == null)
             throw new ArgumentNullException(nameof(filterString));
 
-        filterString = filterString
-            .Replace("$filter=", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Trim();
+        if (filterString.StartsWith("$filter=", StringComparison.OrdinalIgnoreCase))
+            filterString = filterString.Substring("$filter=".Length);
+
+        filterString = filterString.Trim();
 
         var expressionsBag = new Dictionary<string, FilterCriteria.FilterExpression>();
 
@@ -104,12 +105,13 @@ internal partial class ODataParser : IQueryCriteriaParser
         if (orderByString == null)
             throw new ArgumentNullException(nameof(orderByString));
 
-        orderByString = orderByString
-            .Replace("$orderby=", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Trim();
+        if (orderByString.StartsWith("$orderby=", StringComparison.OrdinalIgnoreCase))
+            orderByString = orderByString.Substring("$orderby=".Length);
+
+        orderByString = orderByString.Trim();
 
         var orderByItems = orderByString
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Tokenize(',')
             .Select(_ => ParseOrderByItem(_))
             .ToArray();
 
@@ -121,7 +123,7 @@ internal partial class ODataParser : IQueryCriteriaParser
         if (itemString == null)
             throw new ArgumentNullException(nameof(itemString));
 
-        var parts = itemString.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var parts = itemString.Tokenize(' ');
         var propertyPath = parts[0];
         var direction = parts.Length > 1 && parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase)
             ? OrderByCriteria.SortDirection.Descending
@@ -170,7 +172,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private static string ProcessNotExpressions(string filterString, Dictionary<string, FilterCriteria.FilterExpression> expressionsBag)
     {
-        var notMatches = NotExpressionsRegex().Matches(filterString);
+        var notMatches = NotExpressionsRegex.Matches(filterString);
         foreach (Match notMatch in notMatches)
         {
             var notStatement = notMatch.Value;
@@ -204,7 +206,8 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private static string[] GetInnerLogicalExpressions(string filterString)
     {
-        return SurroundedByParenthesesRegex().Matches(filterString)
+        return SurroundedByParenthesesRegex.Matches(filterString)
+            .Cast<Match>()
                 .Select(m => m.Value)
                 .ToArray();
     }
@@ -217,7 +220,7 @@ internal partial class ODataParser : IQueryCriteriaParser
     {
         foreach (var innerExpression in innerExpressions)
         {
-            var expression = innerExpression[1..^1]; // remove surrounding parentheses
+            var expression = innerExpression.Substring(1, innerExpression.Length - 2); // remove surrounding parentheses
 
             var logicalExpression = CreateLogicalExpression(expression, expressionsBag);
 
@@ -231,7 +234,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private FilterCriteria.FilterExpression CreateTopLevelExpression(string filterString, Dictionary<string, FilterCriteria.FilterExpression> expressionsBag)
     {
-        if (LogicalOperatorsRegex().IsMatch(filterString))
+        if (LogicalOperatorsRegex.IsMatch(filterString))
         {
             return CreateLogicalExpression(filterString, expressionsBag);
         }
@@ -266,7 +269,7 @@ internal partial class ODataParser : IQueryCriteriaParser
             Operator: logicalOperator,
             First: expressions[0],
             Second: expressions[1],
-            Others: expressions.Length > 2 ? expressions[2..] : []
+            Others: expressions.Length > 2 ? expressions.Skip(2).ToArray() : Array.Empty<FilterCriteria.FilterExpression>()
             );
 
         return logicalExpression;
@@ -275,8 +278,9 @@ internal partial class ODataParser : IQueryCriteriaParser
     private string[] GetExpressionKeys(string expressionString)
     {
 
-        var expressionKeys = ExpressionKeysRegex()
+        var expressionKeys = ExpressionKeysRegex
             .Matches(expressionString)
+            .Cast<Match>()
             .Select(m => m.Value)
             .ToArray();
 
@@ -285,8 +289,9 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private FilterCriteria.LogicalOperator GetLogicalOperator(string filterString)
     {
-        var logicalOperators = LogicalOperatorsRegex()
+        var logicalOperators = LogicalOperatorsRegex
             .Matches(filterString)
+            .Cast<Match>()
             .Select(m => m.Value.Trim().ToLower())
             .ToArray();
 
@@ -312,7 +317,7 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private FilterCriteria.ComparisonExpression CreateComparisonExpression(string comparisonStatement)
     {
-        var parts = ExpressionRegex().Matches(comparisonStatement.Trim()).Select(m => m.Value).ToArray();
+        var parts = ExpressionRegex.Matches(comparisonStatement.Trim()).Cast<Match>().Select(m => m.Value).ToArray();
 
         if (parts.Length != 3)
         {
@@ -336,8 +341,9 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     public string[] GetComparisonStatements(string filterString)
     {
-        var comparisonStatements = ComparisonStatementsRegex()
+        var comparisonStatements = ComparisonStatementsRegex
             .Matches(filterString)
+            .Cast<Match>()
             .Select(m => m.Value).ToArray();
 
         if (comparisonStatements.Length == 0)
@@ -353,19 +359,19 @@ internal partial class ODataParser : IQueryCriteriaParser
         if (comparisonOperator == FilterCriteria.ComparisonOperator.In)
         {
             // handle 'in' operator with multiple values in parentheses
-            var match = InValuesRegex().Match(valueString);
+            var match = InValuesRegex.Match(valueString);
             if (!match.Success)
             {
                 throw new FormatException("Invalid syntax for 'in' operator.");
             }
 
             var valuesPart = match.Groups[1].Value;
-            var valueTypes = valuesPart.Split(',')
-                .Select(v => v.Trim())
-                .Select(v => { var (value, type) = ParseValue(v); return new { value, type }; })
+            var valueTypes = valuesPart.Tokenize(',')
+                .Select(v => ParseValue(v))
                 .ToArray();
 
-            if (valueTypes.DistinctBy(vt => vt.type).Count() > 1)
+            var types = valueTypes.Select(vt => vt.type).ToArray();
+            if (types.Distinct().Count() > 1)
             {
                 throw new FormatException("All values for 'in' operator must be of the same type.");
             }
@@ -385,14 +391,14 @@ internal partial class ODataParser : IQueryCriteriaParser
         return ParseValue(valueString).Item1;
     }
 
-    internal static (object?, Type) ParseValue(string valueString)
+    internal static (object? value, Type type) ParseValue(string valueString)
     {
         if (valueString.Equals("null", StringComparison.OrdinalIgnoreCase))
         {
             return (null!, typeof(object));
         }
 
-        var quotesRegex = QuotesRegex();
+        var quotesRegex = QuotesRegex;
         if (quotesRegex.IsMatch(valueString))
         {
             return (quotesRegex.Replace(valueString, "$1"), typeof(string));
@@ -402,7 +408,7 @@ internal partial class ODataParser : IQueryCriteriaParser
         {
             return (intValue, typeof(int));
         }
-        if (double.TryParse(valueString, CultureInfo.InvariantCulture, out var doubleValue))
+        if (double.TryParse(valueString, NumberStyles.Float, CultureInfo.InvariantCulture, out var doubleValue))
         {
             return (doubleValue, typeof(double));
         }
@@ -447,36 +453,46 @@ internal partial class ODataParser : IQueryCriteriaParser
         {"in", FilterCriteria.ComparisonOperator.In}
     };
 
-    [GeneratedRegex(@"([\w\.]+\s+(?:\w+)\s+(?:null|true|false|'[^']*'|[\d\-T\:\.Z]+|\((?:(?:null|true|false|'[^']*'|[\d\-T\:\.Z]+)(?:\s*,\s*)?)+\)))", RegexOptions.IgnoreCase)]
-    private static partial Regex ComparisonStatementsRegex();
+    private static readonly Regex ComparisonStatementsRegex = new(
+        @"([\w\.]+\s+(?:\w+)\s+(?:null|true|false|'[^']*'|[\d\-T\:\.Z]+|\((?:(?:null|true|false|'[^']*'|[\d\-T\:\.Z]+)(?:\s*,\s*)?)+\)))", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"\s+(and|or)\s+", RegexOptions.IgnoreCase)]
-    private static partial Regex LogicalOperatorsRegex();
+    private static readonly Regex LogicalOperatorsRegex = new(
+        @"\s+(and|or)\s+", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"(?:not\s+\((?'key1'\|\d+\|)\))|(?:not\s+(?'key2'\|\d+\|))", RegexOptions.IgnoreCase)]
-    private static partial Regex NotExpressionsRegex();
+    private static readonly Regex NotExpressionsRegex = new(
+        @"(?:not\s+\((?'key1'\|\d+\|)\))|(?:not\s+(?'key2'\|\d+\|))", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"\(([^()]+)\)")]
-    private static partial Regex SurroundedByParenthesesRegex();
+    private static readonly Regex SurroundedByParenthesesRegex = new(
+        @"\(([^()]+)\)", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"('([^']|'')*'|\([^)]*\)|\S+)")]
-    private static partial Regex ExpressionRegex();
+    private static readonly Regex ExpressionRegex = new(
+        @"('([^']|'')*'|\([^)]*\)|\S+)", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"^'(.*)'$")]
-    private static partial Regex QuotesRegex();
+    private static readonly Regex QuotesRegex = new(
+        @"^'(.*)'$", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"(\|\d+\|)")]
-    private static partial Regex ExpressionKeysRegex();
+    private static readonly Regex ExpressionKeysRegex = new(
+        @"(\|\d+\|)", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"\$skip=(\d+)", RegexOptions.IgnoreCase)]
-    private static partial Regex SkipRegex();
+    private static readonly Regex SkipRegex = new(
+        @"\$skip=(\d+)", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"\$top=(\d+)", RegexOptions.IgnoreCase)]
-    private static partial Regex TopRegex();
+    private static readonly Regex TopRegex = new(
+        @"\$top=(\d+)", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex CountRegex = new(
+        @"\$count=(true|false)", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"\$count=(true|false)", RegexOptions.IgnoreCase)]
-    private static partial Regex CountRegex();
-
-    [GeneratedRegex(@"\((.*)\)")]
-    private static partial Regex InValuesRegex();
+    private static readonly Regex InValuesRegex = new(
+        @"\((.*)\)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 }
