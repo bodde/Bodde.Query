@@ -436,13 +436,18 @@ builder.Services.AddQueryServices(options => options
 
 ## Compatibility
 
-All Bodde.Query packages currently target `.NET 10` (`net10.0`).
+The core Bodde.Query packages target `netstandard2.0`, while the Entity Framework
+Core integration provides separate builds for `.NET 8` and `.NET 10`.
 
 | Package | Compatibility |
 | --- | --- |
-| `Bodde.Query.Abstractions` | Compatible with `.NET 10` applications. It has no external package dependencies and can be referenced by Domain projects. |
-| `Bodde.Query.Core` | Compatible with `.NET 10` applications and uses `Microsoft.Extensions.DependencyInjection.Abstractions` `10.0.10` for service registration. |
-| `Bodde.Query.EntityFrameworkCore` | Compatible with `.NET 10` applications using Entity Framework Core `10.0.10`. |
+| `Bodde.Query.Abstractions` | Targets `netstandard2.0`, has no external package dependencies, and can be referenced by compatible .NET and .NET Framework applications. |
+| `Bodde.Query.Core` | Targets `netstandard2.0` and uses `Microsoft.Extensions.DependencyInjection.Abstractions` `8.0.0` for service registration. |
+| `Bodde.Query.EntityFrameworkCore` | Targets `net8.0` and `net10.0`. The `net8.0` build uses Entity Framework Core `8.0.30`; the `net10.0` build uses Entity Framework Core `10.0.11`. |
+
+The sample projects follow the runtime they demonstrate: `Samples.Common` and
+`Samples.Common.EFCore` target both `net8.0` and `net10.0`, while the MVC sample
+currently targets `net8.0`.
 
 The library works with `IQueryable<T>` and can be used with LINQ providers that support the generated expression trees. When using Entity Framework Core, the final query must also be translatable by the configured database provider.
 
