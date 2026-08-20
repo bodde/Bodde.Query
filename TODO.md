@@ -31,6 +31,9 @@
 - [x] Convert to .NET Standard 2.0: Bodde.Query.Core
 - [x] Add .NET 8 compatibility to Bodde.Query.EntityFrameworkCore
 
+# Read
+- [ ] [Migrate to MTP mode of dotnet test](https://learn.microsoft.com/en-gb/dotnet/core/testing/unit-testing-with-dotnet-test#migrate-to-mtp-mode-of-dotnet-test)
+
 # Move common extension methods to Bodde.Common.Extension
 - [ ] Tokenize
 - [ ] ToDisplayTable -> FormatAsTable
@@ -57,4 +60,5 @@
   - [ ] Create GitHub Action
   - [ ] Create Tag/Release
   - [ ] Publish
+- Add Code coverage badges with [Shields](https://shields.io)
 
