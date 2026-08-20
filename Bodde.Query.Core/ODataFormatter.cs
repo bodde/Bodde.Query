@@ -26,7 +26,8 @@ internal class ODataFormatter : IQueryCriteriaFormatter
 
     public string FormatPaging(PagingCriteria paging)
     {
-        ArgumentNullException.ThrowIfNull(paging);
+        if (paging == null)
+            throw new ArgumentNullException(nameof(paging));
 
         var parts = new List<string>();
 
@@ -45,14 +46,16 @@ internal class ODataFormatter : IQueryCriteriaFormatter
 
     public string FormatFilter(FilterCriteria filter)
     {
-        ArgumentNullException.ThrowIfNull(filter);
+        if (filter == null)
+            throw new ArgumentNullException(nameof(filter));
 
         return $"$filter={FormatFilterExpression(filter.Expression)}";
     }
 
     public string FormatOrderBy(OrderByCriteria orderBy)
     {
-        ArgumentNullException.ThrowIfNull(orderBy);
+        if (orderBy == null)
+            throw new ArgumentNullException(nameof(orderBy));
 
         if (orderBy.Items.Length == 0)
             return string.Empty;

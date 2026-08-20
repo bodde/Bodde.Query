@@ -10,7 +10,8 @@ internal partial class ODataParser : IQueryCriteriaParser
 {
     public QueryCriteria Parse(string criteriaString)
     {
-        ArgumentNullException.ThrowIfNull(criteriaString, nameof(criteriaString));
+        if (criteriaString == null)
+            throw new ArgumentNullException(nameof(criteriaString));
 
         var paging = ParsePaging(criteriaString);
 
@@ -39,7 +40,8 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     public QueryCriteria Parse(QueryCriteriaParams queryCriteriaParameters)
     {
-        ArgumentNullException.ThrowIfNull(queryCriteriaParameters, nameof(queryCriteriaParameters));
+        if (queryCriteriaParameters == null)
+            throw new ArgumentNullException(nameof(queryCriteriaParameters));
 
         var paging = new PagingCriteria(
             Skip: queryCriteriaParameters.Skip,
@@ -60,7 +62,8 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     public PagingCriteria ParsePaging(string pagingString)
     {
-        ArgumentNullException.ThrowIfNull(pagingString, nameof(pagingString));
+        if (pagingString == null)
+            throw new ArgumentNullException(nameof(pagingString));
 
         var skipValue = SkipRegex().Match(pagingString).Groups[1].Value;
         var topValue = TopRegex().Match(pagingString).Groups[1].Value;
@@ -75,7 +78,8 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     public FilterCriteria.FilterExpression ParseFilterExpression(string filterString)
     {
-        ArgumentNullException.ThrowIfNull(filterString, nameof(filterString));
+        if (filterString == null)
+            throw new ArgumentNullException(nameof(filterString));
 
         filterString = filterString
             .Replace("$filter=", string.Empty, StringComparison.OrdinalIgnoreCase)
@@ -97,7 +101,8 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     public OrderByCriteria ParseOrderBy(string orderByString)
     {
-        ArgumentNullException.ThrowIfNull(orderByString, nameof(orderByString));
+        if (orderByString == null)
+            throw new ArgumentNullException(nameof(orderByString));
 
         orderByString = orderByString
             .Replace("$orderby=", string.Empty, StringComparison.OrdinalIgnoreCase)
@@ -113,7 +118,8 @@ internal partial class ODataParser : IQueryCriteriaParser
 
     private OrderByCriteria.OrderByItem ParseOrderByItem(string itemString)
     {
-        ArgumentNullException.ThrowIfNull(itemString, nameof(itemString));
+        if (itemString == null)
+            throw new ArgumentNullException(nameof(itemString));
 
         var parts = itemString.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var propertyPath = parts[0];

@@ -17,7 +17,8 @@ public static class QueryWithCriteriaExtensions
         /// <returns>A query with the specified name.</returns>
         public QueryWithCriteria<T> WithName(string name)
         {     
-            ArgumentNullException.ThrowIfNull(name);
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
         
             return new(
                 name,
@@ -35,7 +36,8 @@ public static class QueryWithCriteriaExtensions
         /// <returns>A query with the filter applied to its criteria.</returns>
         public QueryWithCriteria<T> WithFilter(string filterStatement)
         { 
-            ArgumentNullException.ThrowIfNull(filterStatement, nameof(filterStatement));
+            if (filterStatement == null)
+                throw new ArgumentNullException(nameof(filterStatement));
 
             var filterExpression = query.Toolkit.Parser.ParseFilterExpression(filterStatement);
 
@@ -55,7 +57,8 @@ public static class QueryWithCriteriaExtensions
         /// <returns>A query with the ordering applied to its criteria.</returns>
         public QueryWithCriteria<T> WithOrderBy(string orderByStatement)
         {
-            ArgumentNullException.ThrowIfNull(orderByStatement, nameof(orderByStatement));
+            if (orderByStatement == null)
+                throw new ArgumentNullException(nameof(orderByStatement));
 
             var orderByCriteria = query.Toolkit.Parser.ParseOrderBy(orderByStatement);
 
