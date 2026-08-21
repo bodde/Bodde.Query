@@ -32,7 +32,7 @@
 - [x] Add .NET 8 compatibility to Bodde.Query.EntityFrameworkCore
 
 # Read
-- [ ] [Migrate to MTP mode of dotnet test](https://learn.microsoft.com/en-gb/dotnet/core/testing/unit-testing-with-dotnet-test#migrate-to-mtp-mode-of-dotnet-test)
+- [x] [Migrate to MTP mode of dotnet test](https://learn.microsoft.com/en-gb/dotnet/core/testing/unit-testing-with-dotnet-test#migrate-to-mtp-mode-of-dotnet-test)
 
 # Move common extension methods to Bodde.Common.Extensions
 - [ ] Tokenize
