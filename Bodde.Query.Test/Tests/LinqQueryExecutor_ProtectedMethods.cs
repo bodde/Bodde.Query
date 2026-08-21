@@ -33,7 +33,7 @@ public class LinqQueryExecutor_ProtectedMethods
     {
         var data = EmployeeSetBuilder.Build().AsQueryable();
 
-        var actual = await sut.ProtectedToArrayAsync(data);
+        var actual = await sut.ProtectedToArrayAsync(data, TestContext.Current.CancellationToken);
 
         Assert.Equal(data, actual);
     }
@@ -43,7 +43,7 @@ public class LinqQueryExecutor_ProtectedMethods
     {
         var data = EmployeeSetBuilder.Build().AsQueryable();
 
-        var actual = await sut.ProtectedCountAsync(data);
+        var actual = await sut.ProtectedCountAsync(data, TestContext.Current.CancellationToken);
 
         Assert.Equal(data.Count(), actual);
     }
@@ -53,10 +53,10 @@ public class LinqQueryExecutor_ProtectedMethods
     {
         public int ProtectedCount<T>(IQueryable<T> query) => Count(query);
 
-        public Task<int> ProtectedCountAsync<T>(IQueryable<T> query, CancellationToken ct = default) => CountAsync(query);
+        public Task<int> ProtectedCountAsync<T>(IQueryable<T> query, CancellationToken ct = default) => CountAsync(query, ct);
 
         public T[] ProtectedToArray<T>(IQueryable<T> query) => ToArray(query);
 
-        public Task<T[]> ProtectedToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default) => ToArrayAsync(query);
+        public Task<T[]> ProtectedToArrayAsync<T>(IQueryable<T> query, CancellationToken ct = default) => ToArrayAsync(query, ct);
     }
 }

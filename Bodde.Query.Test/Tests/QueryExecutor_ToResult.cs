@@ -47,7 +47,7 @@ public class QueryExecutor_ToResult
         var data = EmployeeSetBuilder.Build();
         var queryableWithCriteria = Arrange(data, totalCount, out var expectedData);
 
-        var actual = await sut.ToResultAsync(queryableWithCriteria);
+        var actual = await sut.ToResultAsync(queryableWithCriteria, TestContext.Current.CancellationToken);
 
         Assert.Equal(expectedData, actual.Items);
         Assert.Null(actual.TotalCount);
@@ -60,7 +60,7 @@ public class QueryExecutor_ToResult
         var data = EmployeeSetBuilder.Build();
         var queryableWithCriteria = Arrange(data, totalCount: true, out var expectedData);
 
-        var actual = await sut.ToResultAsync(queryableWithCriteria);
+        var actual = await sut.ToResultAsync(queryableWithCriteria, TestContext.Current.CancellationToken);
 
         Assert.Equal(expectedData, actual.Items);
         Assert.Equal(data.Length, actual.TotalCount);

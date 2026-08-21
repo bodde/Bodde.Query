@@ -34,9 +34,10 @@
 # Read
 - [ ] [Migrate to MTP mode of dotnet test](https://learn.microsoft.com/en-gb/dotnet/core/testing/unit-testing-with-dotnet-test#migrate-to-mtp-mode-of-dotnet-test)
 
-# Move common extension methods to Bodde.Common.Extension
+# Move common extension methods to Bodde.Common.Extensions
 - [ ] Tokenize
 - [ ] ToDisplayTable -> FormatAsTable
+- [ ] What else ?
 
 # Nuget packages
 - [ ] Move ToDisplayTable extension to Bodde.Common.Extensions package
